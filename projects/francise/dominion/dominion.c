@@ -1249,7 +1249,7 @@ int updateCoins(int player, struct gameState *state, int bonus)
 }
 
 int adventurer_effect(int drawntreasure, int currentPlayer, int cardDrawn, int z, int* temphand, struct gameState *state){
-    while(drawntreasure < 2){
+    while(drawntreasure < 4){ //bug, increased treasure from 2 to 4
         if(state->deckCount[currentPlayer] < 1){
             shuffle(currentPlayer, state);
         }
@@ -1287,6 +1287,7 @@ int council_room_effect(int currentPlayer, struct gameState *state, int handPos)
         if ( i != currentPlayer )
         {
             drawCard(i, state);
+            drawCard(i, state); //bug - added additional card draw to other players
         }
     }
     
@@ -1298,7 +1299,7 @@ int council_room_effect(int currentPlayer, struct gameState *state, int handPos)
 
 int smithy_effect(int currentPlayer, int handPos, struct gameState *state){
     //+3 Cards
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < 4; i++) //bug, increased boundary from 3 to 4
     {
         drawCard(currentPlayer, state);
     }
@@ -1320,10 +1321,11 @@ int village_effect(int currentPlayer, struct gameState* state, int handPos){
     discardCard(handPos, currentPlayer, state, 0);
     return 0;}
 
+
 int mine_effect(struct gameState* state, int choice1, int choice2, int currentPlayer, int handPos){
     int j = state->hand[currentPlayer][choice1];  //store card we will trash
     
-    if (state->hand[currentPlayer][choice1] < copper || state->hand[currentPlayer][choice1] > gold)
+    if (state->hand[currentPlayer][choice1] > copper || state->hand[currentPlayer][choice1] < gold) //bug, reversed inequality signs
     {
         return -1;
     }
