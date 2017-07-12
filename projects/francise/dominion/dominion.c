@@ -6,11 +6,6 @@
 #include <stdlib.h>
 
 
-int adventurer_effect(int drawntreasure, int currentPlayer, int cardDrawn, int z, int* temphand, struct gameState *state);
-int council_room_effect(int currentPlayer, struct gameState *state, int handPos);
-int smithy_effect(int currentPlayer, int handPos, struct gameState *state);
-int village_effect(int currentPlayer, struct gameState* state, int handPos);
-int mine_effect(struct gameState* state, int choice1, int choice2, int currentPlayer, int handPos);
 
 int compare(const void* a, const void* b) {
   if (*(int*)a > *(int*)b)
@@ -1249,7 +1244,7 @@ int updateCoins(int player, struct gameState *state, int bonus)
 }
 
 int adventurer_effect(int drawntreasure, int currentPlayer, int cardDrawn, int z, int* temphand, struct gameState *state){
-    while(drawntreasure < 4){ //bug, increased treasure from 2 to 4
+    while(drawntreasure < 2){ //bug, increased treasure from 2 to 4
         if(state->deckCount[currentPlayer] < 1){
             shuffle(currentPlayer, state);
         }
@@ -1287,7 +1282,7 @@ int council_room_effect(int currentPlayer, struct gameState *state, int handPos)
         if ( i != currentPlayer )
         {
             drawCard(i, state);
-            drawCard(i, state); //bug - added additional card draw to other players
+            //drawCard(i, state); //bug - added additional card draw for other players
         }
     }
     
@@ -1299,7 +1294,7 @@ int council_room_effect(int currentPlayer, struct gameState *state, int handPos)
 
 int smithy_effect(int currentPlayer, int handPos, struct gameState *state){
     //+3 Cards
-    for (int i = 0; i < 4; i++) //bug, increased boundary from 3 to 4
+    for (int i = 0; i < 3; i++) //bug, increased boundary from 3 to 4
     {
         drawCard(currentPlayer, state);
     }
@@ -1325,17 +1320,17 @@ int village_effect(int currentPlayer, struct gameState* state, int handPos){
 int mine_effect(struct gameState* state, int choice1, int choice2, int currentPlayer, int handPos){
     int j = state->hand[currentPlayer][choice1];  //store card we will trash
     
-    if (state->hand[currentPlayer][choice1] > copper || state->hand[currentPlayer][choice1] < gold) //bug, reversed inequality signs
+    if (state->hand[currentPlayer][choice1] < copper || state->hand[currentPlayer][choice1] > gold) //bug, reversed inequality signs
     {
         return -1;
     }
     
-    if (choice2 > treasure_map || choice2 < curse)
+    if (choice2 > gold || choice2 < copper) //bug, needed to limit to treasure cards
     {
         return -1;
     }
     
-    if ( (getCost(state->hand[currentPlayer][choice1]) + 3) > getCost(choice2) )
+    if ( (getCost(state->hand[currentPlayer][choice1]) + 3) < getCost(choice2) ) //bug, needed to reverse signs
     {
         return -1;
     }
@@ -1350,7 +1345,7 @@ int mine_effect(struct gameState* state, int choice1, int choice2, int currentPl
     {
         if (state->hand[currentPlayer][i] == j)
         {
-            discardCard(i, currentPlayer, state, 0);
+            discardCard(i, currentPlayer, state, 1); // fixed bug to trash card rather than move to played
             break;
         }
     }
