@@ -398,7 +398,7 @@ int isGameOver(struct gameState *state) {
       return 1;
     }
 
-  //if three supply pile are at 0, the game ends
+  //if three supply piles are at 0, the game ends
   j = 0;
   for (i = 0; i < 25; i++)
     {
@@ -539,7 +539,7 @@ int drawCard(int player, struct gameState *state)
     state->deckCount[player] = state->discardCount[player];
     state->discardCount[player] = 0;//Reset discard
 
-    //Shufffle the deck
+    //Shuffle the deck
     shuffle(player, state);//Shuffle the deck up and make it so that we can draw
    
     if (DEBUG){//Debug statements

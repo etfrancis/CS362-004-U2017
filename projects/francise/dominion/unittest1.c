@@ -1,17 +1,14 @@
 /*
- * cardtest1.c
+ * unittest1.c
  *
  * Testing isGameOver(struct gameState *state)
- 
  */
-
 /*
  * Include the following lines in your makefile:
  *
  * unittest1: unittest1.c dominion.o rngs.o
  *      gcc -o unittest1 -g  unittest1.c dominion.o rngs.o $(CFLAGS)
  */
-
 
 #include "dominion.h"
 #include "dominion_helpers.h"
@@ -39,7 +36,6 @@ int main() {
     
     //general game variables
     
-    int handpos = -1;
     int seed = 2;
     int numPlayers = 2;
     int thisPlayer = 0;

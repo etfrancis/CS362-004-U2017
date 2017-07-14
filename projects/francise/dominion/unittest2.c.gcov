@@ -1,0 +1,131 @@
+        -:    0:Source:unittest2.c
+        -:    0:Graph:unittest2.gcno
+        -:    0:Data:unittest2.gcda
+        -:    0:Runs:1
+        -:    0:Programs:1
+        -:    1:/*
+        -:    2: * unittest2.c
+        -:    3: *
+        -:    4: * Testing shuffle(int player, struct gameState *state)
+        -:    5: 
+        -:    6: */
+        -:    7:
+        -:    8:/*
+        -:    9: * Include the following lines in your makefile:
+        -:   10: *
+        -:   11: * unittest2: unittest2.c dominion.o rngs.o
+        -:   12: *      gcc -o unittest2 -g  unittest2.c dominion.o rngs.o $(CFLAGS)
+        -:   13: */
+        -:   14:
+        -:   15:
+        -:   16:#include "dominion.h"
+        -:   17:#include "dominion_helpers.h"
+        -:   18:#include <string.h>
+        -:   19:#include <stdio.h>
+        -:   20:#include <assert.h>
+        -:   21:#include "rngs.h"
+        -:   22:#include <stdlib.h>
+        -:   23:
+        -:   24:#define MYASSERT(statement, message) do \
+        -:   25:{ \
+        -:   26:if(!(statement)) \
+        -:   27:{ \
+        -:   28:fprintf(stderr, "Assert failed: %s\n", message);\
+        -:   29:} \
+        -:   30:else \
+        -:   31:{ \
+        -:   32:fprintf(stderr, "Assert passed: %s\n", message);\
+        -:   33:} \
+        -:   34:}while(0)
+        -:   35:
+        -:   36:#define TESTFUNCTION "shuffle"
+        -:   37:
+        -:   38:int main() {
+        -:   39:    
+        -:   40:    //general game variables
+        -:   41:    
+        1:   42:    int seed = 2;
+        1:   43:    int numPlayers = 2;
+        1:   44:    int thisPlayer = 0;
+        -:   45:    struct gameState G, testG;
+        1:   46:    int k[10] = {adventurer, embargo, village, minion, mine, cutpurse,
+        -:   47:        sea_hag, tribute, smithy, council_room};
+        -:   48:    
+        -:   49:    // initialize a game state and player cards.
+        -:   50:    
+        1:   51:    initializeGame(numPlayers, k, seed, &G);
+        -:   52:    
+        1:   53:    printf("----------------- Testing Function: %s ----------------\n", TESTFUNCTION);
+        -:   54:    
+        -:   55:    // ----------- TEST 1:  --------------
+        1:   56:    printf("TEST 1: Full deck from starting conditions\n");
+        -:   57:    
+        -:   58:    // copy the game state to a test case
+        1:   59:    memcpy(&testG, &G, sizeof(struct gameState));
+        -:   60:    
+        1:   61:    int result = shuffle(thisPlayer, &testG);
+        -:   62:    
+        1:   63:    if(testG.deckCount[thisPlayer] > 0){
+        1:   64:    	printf("result = %d, expected = %d\n", result, 0);
+        4:   65:    	MYASSERT(result == 0, "Function returns 0 when shuffling deck with more than 0 cards");
+        1:   66:    }
+        -:   67:    
+        1:   68:    printf("deck count = %d, expected = %d\n", testG.deckCount[thisPlayer], G.deckCount[thisPlayer]);
+        4:   69:    MYASSERT(testG.deckCount[thisPlayer] == G.deckCount[thisPlayer], "Deck count test");
+        -:   70:    
+        -:   71:    
+        -:   72:    int startingCards[25];
+        -:   73:    int postCards[25];
+        -:   74:    
+       52:   75:    for(int i = 0; i < 25; i++){
+       25:   76:        startingCards[i] = 0;
+       25:   77:        postCards[i] = 0;
+       25:   78:    }
+        -:   79:    
+       12:   80:    for(int i = 0; i < G.deckCount[thisPlayer]; i++)
+        5:   81:        startingCards[G.deck[thisPlayer][i]]++;
+        -:   82:    
+       12:   83:    for(int i = 0; i < testG.deckCount[thisPlayer]; i++)
+        5:   84:        postCards[testG.deck[thisPlayer][i]]++;
+        -:   85:    
+       52:   86:    for(int i = 0; i < 25; i++)
+        -:   87:    {
+      100:   88:        MYASSERT(startingCards[i] == postCards[i], "Deck contents identical test");
+       25:   89:    }
+        -:   90:    
+        -:   91:    // ----------- TEST 2:  --------------
+        1:   92:    printf("TEST 2: Empty deck \n");
+        -:   93:    
+        -:   94:    // copy the game state to a test case
+        1:   95:    memcpy(&testG, &G, sizeof(struct gameState));
+        1:   96:    testG.deckCount[thisPlayer] = 0;
+        -:   97:    
+        1:   98:    result = shuffle(thisPlayer, &testG);
+        1:   99:    printf("result = %d, expected = %d\n", result, -1);
+        4:  100:    MYASSERT(result == -1, "Function returns -1 when shuffling empty deck");
+        -:  101:    
+        -:  102:    // ----------- TEST 3:  --------------
+        1:  103:    printf("TEST 3: Full deck from starting conditions -- other decks unaffected\n");
+        -:  104:    
+        -:  105:    // copy the game state to a test case
+        1:  106:    memcpy(&testG, &G, sizeof(struct gameState));
+        -:  107:    
+        1:  108:    result = shuffle(thisPlayer, &testG);
+        -:  109:    
+        6:  110:    for(int i = 0; i < numPlayers; i++){
+        2:  111:        if(i != thisPlayer){
+        1:  112:            printf("deck count = %d, expected = %d\n", testG.deckCount[i], G.deckCount[i]);
+        4:  113:            MYASSERT(testG.deckCount[i] == G.deckCount[i], "Deck count test for other players");
+        1:  114:            if(testG.deckCount[i] == G.deckCount[i]){
+       22:  115:                for(int j = 0; j<testG.deckCount[i]; j++)
+       50:  116:                    MYASSERT(testG.deck[i][j] == G.deck[i][j], "Deck contents identical and same order");
+        1:  117:            }
+        1:  118:    	}
+        2:  119:    }
+        -:  120:
+        1:  121:    printf("\n >>>>> Testing complete %s <<<<<\n\n", TESTFUNCTION);
+        -:  122:
+        1:  123:    return 0;
+        -:  124:}
+        -:  125:
+        -:  126:
