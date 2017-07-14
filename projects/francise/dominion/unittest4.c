@@ -25,11 +25,11 @@
 { \
 if(!(statement)) \
 { \
-fprintf(stderr, "Assert failed: %s\n", message);\
+fprintf(stdout, "Assert failed: %s\n", message);\
 } \
 else \
 { \
-fprintf(stderr, "Assert passed: %s\n", message);\
+fprintf(stdout, "Assert passed: %s\n", message);\
 } \
 }while(0)
 
@@ -50,7 +50,7 @@ int main() {
     
     initializeGame(numPlayers, k, seed, &G);
     
-    printf("----------------- Testing Function: %s ----------------\n", TESTFUNCTION);
+    printf("\n----------------- Testing Function: %s ----------------\n", TESTFUNCTION);
     
     // ----------- TEST 1:  --------------
     printf("\nTEST 1: Gain to hand, discard, or deck when supply is empty or card is unused, check return value -1\n");

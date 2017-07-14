@@ -668,7 +668,7 @@ int cardEffect(int card, int choice1, int choice2, int choice3, struct gameState
   switch( card ) 
     {
     case adventurer:
-     	return adventurer_effect(drawntreasure, currentPlayer, cardDrawn, z, temphand, state);
+     	return adventurer_effect(drawntreasure, currentPlayer, cardDrawn, z, temphand, state, handPos);
             
     case council_room:
             return council_room_effect(currentPlayer, state, handPos);
@@ -1242,25 +1242,44 @@ int updateCoins(int player, struct gameState *state, int bonus)
   return 0;
 }
 
-int adventurer_effect(int drawntreasure, int currentPlayer, int cardDrawn, int z, int* temphand, struct gameState *state){
-    while(drawntreasure < 2){ //bug, increased treasure from 2 to 4
+int adventurer_effect(int drawntreasure, int currentPlayer, int cardDrawn, int z, int* temphand, struct gameState *state, int handPos){
+    int shuffle_count = 0;
+    while(drawntreasure < 2 && shuffle_count < 2){ //bug, increased treasure from 2 to 4
         if(state->deckCount[currentPlayer] < 1){
+            //Step 1 Shuffle the discard pile back into a deck //responds to bug identified by test suite section 2
+            int i;
+            //Move discard to deck
+            for (i = 0; i < state->discardCount[currentPlayer];i++){
+                state->deck[currentPlayer][i] = state->discard[currentPlayer][i];
+                state->discard[currentPlayer][i] = -1;
+            }
+            
+            state->deckCount[currentPlayer] = state->discardCount[currentPlayer];
+            state->discardCount[currentPlayer] = 0;//Reset discard
+            
+            
             shuffle(currentPlayer, state);
+            shuffle_count++;
         }
-        drawCard(currentPlayer, state);
+        int result = drawCard(currentPlayer, state);
         cardDrawn = state->hand[currentPlayer][state->handCount[currentPlayer]-1];//top card of hand is most recently drawn card.
-        if (cardDrawn == copper || cardDrawn == silver || cardDrawn == gold)
+        if (cardDrawn == copper || cardDrawn == silver || cardDrawn == gold){
             drawntreasure++;
+            printf("Found a treasure, %d\n", cardDrawn);}
         else{
+            if(result != -1){
             temphand[z]=cardDrawn;
             state->handCount[currentPlayer]--; //this should just remove the top card (the most recently drawn one).
-            z++;
+                z++;}
         }
     }
     while(z-1>=0){
         state->discard[currentPlayer][state->discardCount[currentPlayer]++]=temphand[z-1]; // discard all cards in play that have been drawn
         z=z-1;
     }
+    
+    //discard card from hand
+    discardCard(handPos, currentPlayer, state, 0);
     return 0;
 }
 

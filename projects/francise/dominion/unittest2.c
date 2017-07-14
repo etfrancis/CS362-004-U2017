@@ -25,11 +25,11 @@
 { \
 if(!(statement)) \
 { \
-fprintf(stderr, "Assert failed: %s\n", message);\
+fprintf(stdout, "Assert failed: %s\n", message);\
 } \
 else \
 { \
-fprintf(stderr, "Assert passed: %s\n", message);\
+fprintf(stdout, "Assert passed: %s\n", message);\
 } \
 }while(0)
 
@@ -50,10 +50,10 @@ int main() {
     
     initializeGame(numPlayers, k, seed, &G);
     
-    printf("----------------- Testing Function: %s ----------------\n", TESTFUNCTION);
+    printf("\n----------------- Testing Function: %s ----------------\n", TESTFUNCTION);
     
     // ----------- TEST 1:  --------------
-    printf("TEST 1: Full deck from starting conditions\n");
+    printf("\nTEST 1: Full deck from starting conditions\n");
     
     // copy the game state to a test case
     memcpy(&testG, &G, sizeof(struct gameState));
@@ -89,7 +89,7 @@ int main() {
     }
     
     // ----------- TEST 2:  --------------
-    printf("TEST 2: Empty deck \n");
+    printf("\nTEST 2: Empty deck \n");
     
     // copy the game state to a test case
     memcpy(&testG, &G, sizeof(struct gameState));
@@ -100,7 +100,7 @@ int main() {
     MYASSERT(result == -1, "Function returns -1 when shuffling empty deck");
     
     // ----------- TEST 3:  --------------
-    printf("TEST 3: Full deck from starting conditions -- show that other decks are unaffected\n");
+    printf("\nTEST 3: Full deck from starting conditions -- show that other decks are unaffected\n");
     
     // copy the game state to a test case
     memcpy(&testG, &G, sizeof(struct gameState));

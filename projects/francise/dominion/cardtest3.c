@@ -25,11 +25,11 @@
 { \
 if(!(statement)) \
 { \
-fprintf(stderr, "Assert failed: %s\n", message);\
+fprintf(stdout, "Assert failed: %s\n", message);\
 } \
 else \
 { \
-fprintf(stderr, "Assert passed: %s\n", message);\
+fprintf(stdout, "Assert passed: %s\n", message);\
 } \
 }while(0)
 
@@ -50,13 +50,9 @@ int main() {
     
 	initializeGame(numPlayers, k, seed, &G);
 
-    for(int i = 0; i < G.handCount[thisPlayer]; i++){
-        if(G.hand[thisPlayer][i] == copper){
-            G.hand[thisPlayer][i] = mine;
-            handpos = i;
-            break;
-        }
-    }
+
+    gainCard(mine, &G, 2, thisPlayer);
+    handpos = G.handCount[thisPlayer] -1;
     
     for(int i = 0; i < G.handCount[thisPlayer]; i++){
         if(G.hand[thisPlayer][i] == copper){
@@ -65,11 +61,9 @@ int main() {
         }
     }
 
-    G.discard[thisPlayer][G.discardCount[thisPlayer]] = copper;
-    G.discardCount[thisPlayer]++;
     
     
-	printf("----------------- Testing Card: %s ----------------\n", TESTCARD);
+	printf("\n----------------- Testing Card: %s ----------------\n", TESTCARD);
 
 	// ----------- TEST 1:  --------------
 	printf("TEST 1: valid choice1, valid choice2\n");

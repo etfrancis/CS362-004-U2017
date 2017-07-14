@@ -22,11 +22,11 @@
 { \
 if(!(statement)) \
 { \
-fprintf(stderr, "Assert failed: %s\n", message);\
+fprintf(stdout, "Assert failed: %s\n", message);\
 } \
 else \
 { \
-fprintf(stderr, "Assert passed: %s\n", message);\
+fprintf(stdout, "Assert passed: %s\n", message);\
 } \
 }while(0)
 
@@ -38,7 +38,7 @@ int main() {
     
     int seed = 2;
     int numPlayers = 2;
-    int thisPlayer = 0;
+    //int thisPlayer = 0;
     struct gameState G, testG;
     int k[10] = {adventurer, embargo, village, minion, mine, cutpurse,
         sea_hag, tribute, smithy, council_room};
@@ -47,10 +47,10 @@ int main() {
     
     initializeGame(numPlayers, k, seed, &G);
     
-    printf("----------------- Testing Function: %s ----------------\n", TESTFUNCTION);
+    printf("\n----------------- Testing Function: %s ----------------\n", TESTFUNCTION);
     
     // ----------- TEST 1:  --------------
-    printf("TEST 1: Province supply count set to 0\n");
+    printf("\nTEST 1: Province supply count set to 0\n");
     
     // copy the game state to a test case
     memcpy(&testG, &G, sizeof(struct gameState));
@@ -65,7 +65,7 @@ int main() {
     
     
     // ----------- TEST 2:  --------------
-    printf("TEST 2: Province supply count > 0, three supply piles set to 0 \n");
+    printf("\nTEST 2: Province supply count > 0, three supply piles set to 0 \n");
     
     // copy the game state to a test case
     memcpy(&testG, &G, sizeof(struct gameState));
@@ -82,7 +82,7 @@ int main() {
     
     
     // ----------- TEST 3:  --------------
-    printf("TEST 3: Province supply count == 0, three supply piles set to 0 \n");
+    printf("\nTEST 3: Province supply count == 0, three supply piles set to 0 \n");
     
     // copy the game state to a test case
     memcpy(&testG, &G, sizeof(struct gameState));
@@ -100,7 +100,7 @@ int main() {
     
 
     // ----------- TEST 4:  --------------
-    printf("TEST 4: Province supply count > 0, all supply piles > 0 \n");
+    printf("\nTEST 4: Province supply count > 0, all supply piles > 0 \n");
     
     // copy the game state to a test case
     memcpy(&testG, &G, sizeof(struct gameState));
@@ -113,7 +113,7 @@ int main() {
     
     
     // ----------- TEST 5:  --------------
-    printf("TEST 5: Province supply count > 0, all supply piles > 0 \n");
+    printf("\nTEST 5: Province supply count > 0, all supply piles > 0 \n");
     
     
     // copy the game state to a test case
@@ -131,7 +131,7 @@ int main() {
     }
     
     // ----------- TEST 6:  --------------
-    printf("TEST 6: Any three supply piles  == 0 \n");
+    printf("\nTEST 6: Any three supply piles  == 0 \n");
     
     
     // copy the game state to a test case
@@ -154,7 +154,7 @@ int main() {
     }
     
     // ----------- TEST 7:  --------------
-    printf("TEST 7: Any three supply piles  == 0 \n");
+    printf("\nTEST 7: Any three supply piles  == 0 \n");
     
     for (int i = 0; i< 25; i++){
         for (int j = 0; j< 25; j++){
@@ -173,11 +173,11 @@ int main() {
     }
     
     // ----------- TEST 8:  --------------
-    printf("TEST 8: Any two supply piles  == 0 \n");
+    printf("\nTEST 8: Any two supply piles  == 0 \n");
     
     for (int i = 0; i< 25; i++){
         for (int j = 0; j< 25; j++){
-                if(i != j){
+                if(i != j && i != province && j != province){
                     memcpy(&testG, &G, sizeof(struct gameState));
                     testG.supplyCount[i] = 0;
                     testG.supplyCount[j] = 0;

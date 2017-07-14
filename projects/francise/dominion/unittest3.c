@@ -25,11 +25,11 @@
 { \
 if(!(statement)) \
 { \
-fprintf(stderr, "Assert failed: %s\n", message);\
+fprintf(stdout, "Assert failed: %s\n", message);\
 } \
 else \
 { \
-fprintf(stderr, "Assert passed: %s\n", message);\
+fprintf(stdout, "Assert passed: %s\n", message);\
 } \
 }while(0)
 
@@ -50,10 +50,10 @@ int main() {
     
     initializeGame(numPlayers, k, seed, &G);
     
-    printf("----------------- Testing Function: %s ----------------\n", TESTFUNCTION);
+    printf("\n----------------- Testing Function: %s ----------------\n", TESTFUNCTION);
     
     // ----------- TEST 1:  --------------
-    printf("TEST 1: All copper hand\n");
+    printf("\nTEST 1: All copper hand\n");
     
     // copy the game state to a test case
     memcpy(&testG, &G, sizeof(struct gameState));
@@ -71,7 +71,7 @@ int main() {
     
     
     // ----------- TEST 2:  --------------
-    printf("TEST 2: All silver hand\n");
+    printf("\nTEST 2: All silver hand\n");
     
     // copy the game state to a test case
     memcpy(&testG, &G, sizeof(struct gameState));
@@ -89,7 +89,7 @@ int main() {
     
     
     // ----------- TEST 3:  --------------
-    printf("TEST 3: All gold hand\n");
+    printf("\nTEST 3: All gold hand\n");
     
     // copy the game state to a test case
     memcpy(&testG, &G, sizeof(struct gameState));
@@ -107,7 +107,7 @@ int main() {
     
     
     // ----------- TEST 4:  --------------
-    printf("TEST 4: Hand does not contain treasure\n");
+    printf("\nTEST 4: Hand does not contain treasure\n");
     
     // copy the game state to a test case
     memcpy(&testG, &G, sizeof(struct gameState));
@@ -126,7 +126,7 @@ int main() {
     
     
     // ----------- TEST 5:  --------------
-    printf("TEST 5: Hand does not contain treasure, but there is a bonus\n");
+    printf("\nTEST 5: Hand does not contain treasure, but there is a bonus\n");
     
     // copy the game state to a test case
     
