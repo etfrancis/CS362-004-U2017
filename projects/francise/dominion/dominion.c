@@ -213,7 +213,7 @@ int shuffle(int player, struct gameState *state) {
   /* SORT CARDS IN DECK TO ENSURE DETERMINISM! */
 
   while (state->deckCount[player] > 0) {
-    card = floor(Random() * state->deckCount[player]);
+    card = floor(Random() * state->deckCount[player]); //bug, since Random() can return 1.0
     newDeck[newDeckPos] = state->deck[player][card];
     newDeckPos++;
     for (i = card; i < state->deckCount[player]-1; i++) {
@@ -1363,7 +1363,7 @@ int mine_effect(struct gameState* state, int choice1, int choice2, int currentPl
     {
         if (state->hand[currentPlayer][i] == j)
         {
-            discardCard(i, currentPlayer, state, 1); // fixed bug to trash card rather than move to played
+            discardCard(choice1, currentPlayer, state, 1); // fixed bug to trash card rather than move to played
             break;
         }
     }

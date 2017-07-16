@@ -479,6 +479,65 @@ int main() {
     MYASSERT(testG.supplyCount[choice2] == G.supplyCount[choice2] - 1, "Choice2 in supply decreased by 1 test");
 
 
+    // ----------- TEST 8:  --------------
+    printf("TEST 8: valid choice1, valid choice2; moving choice1 to index 1 to ensure branch coverage\n");
+    
+    
+    G.hand[thisPlayer][0] = province;
+    G.hand[thisPlayer][1] = copper;
+    choice2 = silver;
+    choice1 = 1;
+    
+    // copy the game state to a test case
+    memcpy(&testG, &G, sizeof(struct gameState));
+    
+    choice2 = silver;
+    
+    mine_effect(&testG, choice1, choice2, thisPlayer, handpos);
+    
+    printf("hand count = %d, expected = %d\n", testG.handCount[thisPlayer], G.handCount[thisPlayer] - 1);
+    
+    printf("deck count for current player = %d, expected = %d\n",  testG.deckCount[thisPlayer], G.deckCount[thisPlayer]);
+    
+    printf("ending played card count = %d, expected = %d\n", testG.playedCardCount, G.playedCardCount + 1);
+    
+     handstartingchoice2 = 0;
+    for(int i = 0; i < G.handCount[thisPlayer]; i++)
+        if ( G.hand[thisPlayer][i] == choice2)
+            handstartingchoice2++;
+    
+     handendingchoice2 = 0;
+    for(int i = 0; i < testG.handCount[thisPlayer]; i++)
+        if ( testG.hand[thisPlayer][i] == choice2)
+            handendingchoice2++;
+    printf("ending hand choice2 = %d, expected = %d\n", handendingchoice2, handstartingchoice2 + 1);
+    
+     handstartingchoice1 = 0;
+    for(int i = 0; i < G.handCount[thisPlayer]; i++)
+        if ( G.hand[thisPlayer][i] == G.hand[thisPlayer][choice1])
+            handstartingchoice1++;
+    
+     handendingchoice1 = 0;
+    for(int i = 0; i < testG.handCount[thisPlayer]; i++)
+        if ( testG.hand[thisPlayer][i] == G.hand[thisPlayer][choice1])
+            handendingchoice1++;
+    printf("ending hand choice1 = %d, expected = %d\n", handendingchoice1, handstartingchoice1 - 1);
+    
+    printf("ending count2 supply count = %d, expected = %d\n", testG.supplyCount[choice2], G.supplyCount[choice2] - 1);
+    
+    
+    MYASSERT(testG.handCount[thisPlayer] == G.handCount[thisPlayer] - 1, "Hand count test");
+    
+    MYASSERT(testG.deckCount[thisPlayer] == G.deckCount[thisPlayer], "Deck count test");
+    
+    MYASSERT(testG.playedCardCount == G.playedCardCount + 1, "Played card count test");
+    
+    MYASSERT(handendingchoice1 == handstartingchoice1 - 1, "Choice1 in hand reduced by 1 test");
+    
+    MYASSERT(handendingchoice2 == handstartingchoice2 + 1, "Choice2 in hand increased by 1 test");
+    
+    MYASSERT(testG.supplyCount[choice2] == G.supplyCount[choice2] - 1, "Choice2 in supply decreased by 1 test");
+    
     
 	printf("\n >>>>> Testing complete %s <<<<<\n\n", TESTCARD);
 

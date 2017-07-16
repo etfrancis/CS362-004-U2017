@@ -51,7 +51,7 @@ int main() {
     
 	initializeGame(numPlayers, k, seed, &G);
 
-    gainCard(adventurer, &G, 2, thisPlayer);
+    gainCard(council_room, &G, 2, thisPlayer);
     handpos = G.handCount[thisPlayer] -1;
     
     
