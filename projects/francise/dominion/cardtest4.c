@@ -52,7 +52,7 @@ int main() {
 	int k[10] = {adventurer, embargo, village, minion, mine, cutpurse,
 			sea_hag, tribute, smithy, council_room};
 
-	// initialize a game state and player cards. Discard a copper and replace with adventurer card in hand.
+	// initialize a game state and player cards. Gain adventurer card to hand
     initializeGame(numPlayers, k, seed, &G);
     
     gainCard(adventurer, &G, 2, thisPlayer);
@@ -212,6 +212,102 @@ int main() {
     MYASSERT(handendingTreasure == handstartingTreasure, "Hand treasure test");
     MYASSERT(deckendingTreasure == deckstartingTreasure, "Deck treasure test");
     MYASSERT(testG.playedCardCount == G.playedCardCount + 1, "Played card count test");
+    
+    
+    // ----------- TEST 4:  --------------
+    printf("\nTEST 4: normal deck with all copper replaced with gold\n");
+    
+    // copy the game state to a test case
+    memcpy(&testG, &G, sizeof(struct gameState));
+    
+    for(int i = 0; i < testG.deckCount[thisPlayer]; i++)
+        if(testG.deck[thisPlayer][i] == copper)
+            testG.deck[thisPlayer][i] = gold;
+    
+    adventurer_effect(drawntreasure, thisPlayer, cardDrawn, z, temphand, &testG, handpos);
+    
+    printf("hand count = %d, expected = %d\n", testG.handCount[thisPlayer], G.handCount[thisPlayer] + 1);
+    printf("deck count = %d, expected = %d\n", testG.deckCount[thisPlayer], G.deckCount[thisPlayer] - 2);
+    
+    handstartingTreasure = 0;
+    for(int i = 0; i < G.handCount[thisPlayer]; i++)
+        if ( G.hand[thisPlayer][i] == copper || G.hand[thisPlayer][i] == silver || G.hand[thisPlayer][i] == gold)
+            handstartingTreasure++;
+    
+    handendingTreasure = 0;
+    for(int i = 0; i < testG.handCount[thisPlayer]; i++)
+        if ( testG.hand[thisPlayer][i] == copper || testG.hand[thisPlayer][i] == silver || testG.hand[thisPlayer][i] == gold)
+            handendingTreasure++;
+    printf("ending hand treasure = %d, expected = %d\n", handendingTreasure, handstartingTreasure + 2);
+    
+    deckstartingTreasure = 0;
+    for(int i = 0; i < G.deckCount[thisPlayer]; i++)
+        if ( G.deck[thisPlayer][i] == copper || G.deck[thisPlayer][i] == silver || G.deck[thisPlayer][i] == gold)
+            deckstartingTreasure++;
+    
+    deckendingTreasure = 0;
+    for(int i = 0; i < testG.deckCount[thisPlayer]; i++)
+        if ( testG.deck[thisPlayer][i] == copper || testG.deck[thisPlayer][i] == silver || testG.deck[thisPlayer][i] == gold)
+            deckendingTreasure++;
+    printf("ending deck treasure = %d, expected = %d\n", deckendingTreasure, deckstartingTreasure - 2);
+    
+    printf("ending played card count = %d, expected = %d\n", testG.playedCardCount, G.playedCardCount + 1);
+    
+    
+    MYASSERT(testG.handCount[thisPlayer] == G.handCount[thisPlayer] + 1, "Hand count test");
+    MYASSERT(testG.deckCount[thisPlayer] == G.deckCount[thisPlayer] - 2, "Deck count test");
+    MYASSERT(handendingTreasure == handstartingTreasure + 2, "Hand treasure test");
+    MYASSERT(deckendingTreasure == deckstartingTreasure - 2, "Deck treasure test");
+    MYASSERT(testG.playedCardCount == G.playedCardCount + 1, "Played card count test");
+    
+    
+    // ----------- TEST 5:  --------------
+    printf("\nTEST 5: normal deck with all copper replaced with silver\n");
+    
+    // copy the game state to a test case
+    memcpy(&testG, &G, sizeof(struct gameState));
+    
+    for(int i = 0; i < testG.deckCount[thisPlayer]; i++)
+        if(testG.deck[thisPlayer][i] == copper)
+            testG.deck[thisPlayer][i] = silver;
+    
+    adventurer_effect(drawntreasure, thisPlayer, cardDrawn, z, temphand, &testG, handpos);
+    
+    printf("hand count = %d, expected = %d\n", testG.handCount[thisPlayer], G.handCount[thisPlayer] + 1);
+    printf("deck count = %d, expected = %d\n", testG.deckCount[thisPlayer], G.deckCount[thisPlayer] - 2);
+    
+    handstartingTreasure = 0;
+    for(int i = 0; i < G.handCount[thisPlayer]; i++)
+        if ( G.hand[thisPlayer][i] == copper || G.hand[thisPlayer][i] == silver || G.hand[thisPlayer][i] == gold)
+            handstartingTreasure++;
+    
+    handendingTreasure = 0;
+    for(int i = 0; i < testG.handCount[thisPlayer]; i++)
+        if ( testG.hand[thisPlayer][i] == copper || testG.hand[thisPlayer][i] == silver || testG.hand[thisPlayer][i] == gold)
+            handendingTreasure++;
+    printf("ending hand treasure = %d, expected = %d\n", handendingTreasure, handstartingTreasure + 2);
+    
+    deckstartingTreasure = 0;
+    for(int i = 0; i < G.deckCount[thisPlayer]; i++)
+        if ( G.deck[thisPlayer][i] == copper || G.deck[thisPlayer][i] == silver || G.deck[thisPlayer][i] == gold)
+            deckstartingTreasure++;
+    
+    deckendingTreasure = 0;
+    for(int i = 0; i < testG.deckCount[thisPlayer]; i++)
+        if ( testG.deck[thisPlayer][i] == copper || testG.deck[thisPlayer][i] == silver || testG.deck[thisPlayer][i] == gold)
+            deckendingTreasure++;
+    printf("ending deck treasure = %d, expected = %d\n", deckendingTreasure, deckstartingTreasure - 2);
+    
+    printf("ending played card count = %d, expected = %d\n", testG.playedCardCount, G.playedCardCount + 1);
+    
+    
+    MYASSERT(testG.handCount[thisPlayer] == G.handCount[thisPlayer] + 1, "Hand count test");
+    MYASSERT(testG.deckCount[thisPlayer] == G.deckCount[thisPlayer] - 2, "Deck count test");
+    MYASSERT(handendingTreasure == handstartingTreasure + 2, "Hand treasure test");
+    MYASSERT(deckendingTreasure == deckstartingTreasure - 2, "Deck treasure test");
+    MYASSERT(testG.playedCardCount == G.playedCardCount + 1, "Played card count test");
+
+
 
 
 	printf("\n >>>>> Testing complete %s <<<<<\n\n", TESTCARD);

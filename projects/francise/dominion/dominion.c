@@ -6,7 +6,6 @@
 #include <stdlib.h>
 
 
-
 int compare(const void* a, const void* b) {
   if (*(int*)a > *(int*)b)
     return 1;
@@ -201,6 +200,7 @@ int initializeGame(int numPlayers, int kingdomCards[10], int randomSeed,
 }
 
 int shuffle(int player, struct gameState *state) {
+ 
 
   int newDeck[MAX_DECK];
   int newDeckPos = 0;
@@ -213,7 +213,7 @@ int shuffle(int player, struct gameState *state) {
   /* SORT CARDS IN DECK TO ENSURE DETERMINISM! */
 
   while (state->deckCount[player] > 0) {
-    card = floor(Random() * state->deckCount[player]); //bug, since Random() can return 1.0
+    card = floor(Random() * state->deckCount[player]);
     newDeck[newDeckPos] = state->deck[player][card];
     newDeckPos++;
     for (i = card; i < state->deckCount[player]-1; i++) {
@@ -398,7 +398,7 @@ int isGameOver(struct gameState *state) {
       return 1;
     }
 
-  //if three supply piles are at 0, the game ends
+  //if three supply pile are at 0, the game ends
   j = 0;
   for (i = 0; i < 25; i++)
     {
@@ -539,7 +539,7 @@ int drawCard(int player, struct gameState *state)
     state->deckCount[player] = state->discardCount[player];
     state->discardCount[player] = 0;//Reset discard
 
-    //Shuffle the deck
+    //Shufffle the deck
     shuffle(player, state);//Shuffle the deck up and make it so that we can draw
    
     if (DEBUG){//Debug statements
@@ -1243,43 +1243,24 @@ int updateCoins(int player, struct gameState *state, int bonus)
 }
 
 int adventurer_effect(int drawntreasure, int currentPlayer, int cardDrawn, int z, int* temphand, struct gameState *state, int handPos){
-    int shuffle_count = 0;
-    while(drawntreasure < 2 && shuffle_count < 2){ //bug, increased treasure from 2 to 4
+    while(drawntreasure < 4){ //bug, increased treasure from 2 to 4
         if(state->deckCount[currentPlayer] < 1){
-            //Step 1 Shuffle the discard pile back into a deck //responds to bug identified by test suite section 2
-            int i;
-            //Move discard to deck
-            for (i = 0; i < state->discardCount[currentPlayer];i++){
-                state->deck[currentPlayer][i] = state->discard[currentPlayer][i];
-                state->discard[currentPlayer][i] = -1;
-            }
-            
-            state->deckCount[currentPlayer] = state->discardCount[currentPlayer];
-            state->discardCount[currentPlayer] = 0;//Reset discard
-            
-            
             shuffle(currentPlayer, state);
-            shuffle_count++;
         }
-        int result = drawCard(currentPlayer, state);
+        drawCard(currentPlayer, state);
         cardDrawn = state->hand[currentPlayer][state->handCount[currentPlayer]-1];//top card of hand is most recently drawn card.
-        if (cardDrawn == copper || cardDrawn == silver || cardDrawn == gold){
+        if (cardDrawn == copper || cardDrawn == silver || cardDrawn == gold)
             drawntreasure++;
-            printf("Found a treasure, %d\n", cardDrawn);}
         else{
-            if(result != -1){
             temphand[z]=cardDrawn;
             state->handCount[currentPlayer]--; //this should just remove the top card (the most recently drawn one).
-                z++;}
+            z++;
         }
     }
     while(z-1>=0){
         state->discard[currentPlayer][state->discardCount[currentPlayer]++]=temphand[z-1]; // discard all cards in play that have been drawn
         z=z-1;
     }
-    
-    //discard card from hand
-    discardCard(handPos, currentPlayer, state, 0);
     return 0;
 }
 
@@ -1300,7 +1281,7 @@ int council_room_effect(int currentPlayer, struct gameState *state, int handPos)
         if ( i != currentPlayer )
         {
             drawCard(i, state);
-            //drawCard(i, state); //bug - added additional card draw for other players
+            drawCard(i, state); //bug - added additional card draw to other players
         }
     }
     
@@ -1312,7 +1293,7 @@ int council_room_effect(int currentPlayer, struct gameState *state, int handPos)
 
 int smithy_effect(int currentPlayer, int handPos, struct gameState *state){
     //+3 Cards
-    for (int i = 0; i < 3; i++) //bug, increased boundary from 3 to 4
+    for (int i = 0; i < 4; i++) //bug, increased boundary from 3 to 4
     {
         drawCard(currentPlayer, state);
     }
@@ -1338,17 +1319,17 @@ int village_effect(int currentPlayer, struct gameState* state, int handPos){
 int mine_effect(struct gameState* state, int choice1, int choice2, int currentPlayer, int handPos){
     int j = state->hand[currentPlayer][choice1];  //store card we will trash
     
-    if (state->hand[currentPlayer][choice1] < copper || state->hand[currentPlayer][choice1] > gold) //bug, reversed inequality signs
+    if (state->hand[currentPlayer][choice1] > copper || state->hand[currentPlayer][choice1] < gold) //bug, reversed inequality signs
     {
         return -1;
     }
     
-    if (choice2 > gold || choice2 < copper) //bug, needed to limit to treasure cards
+    if (choice2 > treasure_map || choice2 < curse)
     {
         return -1;
     }
     
-    if ( (getCost(state->hand[currentPlayer][choice1]) + 3) < getCost(choice2) ) //bug, needed to reverse signs
+    if ( (getCost(state->hand[currentPlayer][choice1]) + 3) > getCost(choice2) )
     {
         return -1;
     }
@@ -1363,7 +1344,7 @@ int mine_effect(struct gameState* state, int choice1, int choice2, int currentPl
     {
         if (state->hand[currentPlayer][i] == j)
         {
-            discardCard(choice1, currentPlayer, state, 1); // fixed bug to trash card rather than move to played
+            discardCard(i, currentPlayer, state, 0);
             break;
         }
     }
@@ -1374,4 +1355,3 @@ int mine_effect(struct gameState* state, int choice1, int choice2, int currentPl
 
 
 //end of dominion.c
-

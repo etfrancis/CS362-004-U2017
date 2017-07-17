@@ -100,7 +100,7 @@ int main() {
     MYASSERT(result == -1, "Function returns -1 when shuffling empty deck");
     
     // ----------- TEST 3:  --------------
-    printf("\nTEST 3: Full deck from starting conditions -- show that other decks are unaffected\n");
+    printf("\nTEST 3: Full deck from starting conditions -- show that other decks  are unaffected\n");
     
     // copy the game state to a test case
     memcpy(&testG, &G, sizeof(struct gameState));

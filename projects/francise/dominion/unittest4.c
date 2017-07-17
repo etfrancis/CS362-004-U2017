@@ -65,10 +65,16 @@ int main() {
     int result = gainCard(adventurer, &testG, 0, thisPlayer);
     	printf("result for gain to location %d = %d, expected = %d\n", i, result, -1);
     	MYASSERT(result == -1, "Result is -1 after trying to gain card from empty supply");
+        MYASSERT(testG.handCount[thisPlayer] == G.handCount[thisPlayer], "Hand count unchanged after trying to gain card from empty supply");
+        MYASSERT(testG.deckCount[thisPlayer] == G.deckCount[thisPlayer], "Deck count unchanged after trying to gain card from empty supply");
+        MYASSERT(testG.discardCount[thisPlayer] == G.discardCount[thisPlayer], "Discard count is unchanged after trying to gain card from empty supply");
     
     	result = gainCard(mine, &testG, 0, thisPlayer);
     	printf("result for gain to location %d = %d, expected = %d\n", i, result, -1);
         MYASSERT(result == -1, "Result is -1 after trying to gain card that is not used this game");
+        MYASSERT(testG.handCount[thisPlayer] == G.handCount[thisPlayer], "Hand count unchanged after trying to gain card from empty supply");
+        MYASSERT(testG.deckCount[thisPlayer] == G.deckCount[thisPlayer], "Deck count unchanged after trying to gain card from empty supply");
+        MYASSERT(testG.discardCount[thisPlayer] == G.discardCount[thisPlayer], "Discard count is unchanged after trying to gain card from empty supply");
     }
     
     // ----------- TEST 2:  --------------
