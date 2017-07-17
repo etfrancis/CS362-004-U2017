@@ -65,7 +65,7 @@ int main() {
 
 	// copy the game state to a test case
 	memcpy(&testG, &G, sizeof(struct gameState));
-	adventurer_effect(drawntreasure, thisPlayer, cardDrawn, z, temphand, &testG, handpos);
+	int result = adventurer_effect(drawntreasure, thisPlayer, cardDrawn, z, temphand, &testG, handpos);
 
 	printf("hand count = %d, expected = %d\n", testG.handCount[thisPlayer], G.handCount[thisPlayer] + 1);
 	printf("deck count = %d, expected = %d\n", testG.deckCount[thisPlayer], G.deckCount[thisPlayer] - 2);
@@ -100,6 +100,7 @@ int main() {
 	MYASSERT(handendingTreasure == handstartingTreasure + 2, "Hand treasure test");
     MYASSERT(deckendingTreasure == deckstartingTreasure - 2, "Deck treasure test");
     MYASSERT(testG.playedCardCount == G.playedCardCount + 1, "Played card count test");
+    MYASSERT(result == 0, "Return val is 0");
     
     // ----------- TEST 2:  --------------
     printf("\nTEST 2: empty deck, cards moved to discard pile\n");
@@ -111,7 +112,7 @@ int main() {
         testG.discard[thisPlayer][testG.discardCount[thisPlayer]++] = testG.deck[thisPlayer][i];
             }
     testG.deckCount[thisPlayer] = 0;
-    adventurer_effect(drawntreasure, thisPlayer, cardDrawn, z, temphand, &testG, handpos);
+    result = adventurer_effect(drawntreasure, thisPlayer, cardDrawn, z, temphand, &testG, handpos);
     
     printf("hand count = %d, expected = %d\n", testG.handCount[thisPlayer], G.handCount[thisPlayer] + 1);
     printf("deck count = %d, expected = %d\n", testG.deckCount[thisPlayer], G.deckCount[thisPlayer] - 2);
@@ -146,6 +147,7 @@ int main() {
     MYASSERT(handendingTreasure == handstartingTreasure + 2, "Hand treasure test");
     MYASSERT(deckendingTreasure == deckstartingTreasure - 2, "Deck treasure test");
     MYASSERT(testG.playedCardCount == G.playedCardCount + 1, "Played card count test");
+    MYASSERT(result == 0, "Return val is 0");
     
     
     // ----------- TEST 3:  --------------
@@ -186,7 +188,7 @@ int main() {
         if ( testG.deck[thisPlayer][i] == copper || testG.deck[thisPlayer][i] == silver || testG.deck[thisPlayer][i] == gold)
             deckstartingTreasure++;
     
-    adventurer_effect(drawntreasure, thisPlayer, cardDrawn, z, temphand, &testG, handpos);
+    result = adventurer_effect(drawntreasure, thisPlayer, cardDrawn, z, temphand, &testG, handpos);
     
     printf("hand count = %d, expected = %d\n", testG.handCount[thisPlayer], G.handCount[thisPlayer] - 1);
     printf("deck count = %d, expected = %d\n", testG.deckCount[thisPlayer], 0);
@@ -224,7 +226,7 @@ int main() {
         if(testG.deck[thisPlayer][i] == copper)
             testG.deck[thisPlayer][i] = gold;
     
-    adventurer_effect(drawntreasure, thisPlayer, cardDrawn, z, temphand, &testG, handpos);
+    result = adventurer_effect(drawntreasure, thisPlayer, cardDrawn, z, temphand, &testG, handpos);
     
     printf("hand count = %d, expected = %d\n", testG.handCount[thisPlayer], G.handCount[thisPlayer] + 1);
     printf("deck count = %d, expected = %d\n", testG.deckCount[thisPlayer], G.deckCount[thisPlayer] - 2);
@@ -259,6 +261,7 @@ int main() {
     MYASSERT(handendingTreasure == handstartingTreasure + 2, "Hand treasure test");
     MYASSERT(deckendingTreasure == deckstartingTreasure - 2, "Deck treasure test");
     MYASSERT(testG.playedCardCount == G.playedCardCount + 1, "Played card count test");
+    MYASSERT(result == 0, "Return val is 0");
     
     
     // ----------- TEST 5:  --------------
@@ -271,7 +274,7 @@ int main() {
         if(testG.deck[thisPlayer][i] == copper)
             testG.deck[thisPlayer][i] = silver;
     
-    adventurer_effect(drawntreasure, thisPlayer, cardDrawn, z, temphand, &testG, handpos);
+    result = adventurer_effect(drawntreasure, thisPlayer, cardDrawn, z, temphand, &testG, handpos);
     
     printf("hand count = %d, expected = %d\n", testG.handCount[thisPlayer], G.handCount[thisPlayer] + 1);
     printf("deck count = %d, expected = %d\n", testG.deckCount[thisPlayer], G.deckCount[thisPlayer] - 2);
@@ -306,6 +309,7 @@ int main() {
     MYASSERT(handendingTreasure == handstartingTreasure + 2, "Hand treasure test");
     MYASSERT(deckendingTreasure == deckstartingTreasure - 2, "Deck treasure test");
     MYASSERT(testG.playedCardCount == G.playedCardCount + 1, "Played card count test");
+    MYASSERT(result == 0, "Return val is 0");
 
 
 

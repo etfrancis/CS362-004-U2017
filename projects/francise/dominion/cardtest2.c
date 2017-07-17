@@ -64,7 +64,7 @@ int main() {
 	// copy the game state to a test case
 	memcpy(&testG, &G, sizeof(struct gameState));
     
-    council_room_effect(thisPlayer, &testG, handpos);
+    int result = council_room_effect(thisPlayer, &testG, handpos);
 
 	printf("hand count = %d, expected = %d\n", testG.handCount[thisPlayer], G.handCount[thisPlayer] + 3);
     
@@ -96,6 +96,7 @@ int main() {
 	MYASSERT(testG.playedCardCount == G.playedCardCount + 1, "Played card count test");
     MYASSERT(testG.playedCards[testG.playedCardCount - 1] == council_room, "Played card last added test");
     MYASSERT(testG.numBuys == G.numBuys + 1, "Num Buys increased test");
+    MYASSERT(result == 0, "Return val is 0");
     
     
     // ----------- TEST 2:  --------------
@@ -106,7 +107,7 @@ int main() {
     memcpy(&testG, &G, sizeof(struct gameState));
     testG.deckCount[thisPlayer] = 3;
     
-    council_room_effect(thisPlayer, &testG, handpos);
+    result = council_room_effect(thisPlayer, &testG, handpos);
     
     printf("hand count = %d, expected = %d\n", testG.handCount[thisPlayer], G.handCount[thisPlayer] + 2);
     
@@ -137,6 +138,7 @@ int main() {
     MYASSERT(testG.playedCardCount == G.playedCardCount + 1, "Played card count test");
     MYASSERT(testG.playedCards[testG.playedCardCount - 1] == council_room, "Played card last added test");
     MYASSERT(testG.numBuys == G.numBuys + 1, "Num Buys increased test");
+    MYASSERT(result == 0, "Return val is 0");
     
     
     // ----------- TEST 3:  --------------
@@ -147,7 +149,7 @@ int main() {
     memcpy(&testG, &G, sizeof(struct gameState));
     testG.deckCount[thisPlayer] = 4;
     
-    council_room_effect(thisPlayer, &testG, handpos);
+    result = council_room_effect(thisPlayer, &testG, handpos);
     
     printf("hand count = %d, expected = %d\n", testG.handCount[thisPlayer], G.handCount[thisPlayer] + 3);
     
@@ -178,6 +180,7 @@ int main() {
     MYASSERT(testG.playedCardCount == G.playedCardCount + 1, "Played card count test");
     MYASSERT(testG.playedCards[testG.playedCardCount - 1] == council_room, "Played card last added test");
     MYASSERT(testG.numBuys == G.numBuys + 1, "Num Buys increased test");
+    MYASSERT(result == 0, "Return val is 0");
     
     
     
@@ -193,7 +196,7 @@ int main() {
         }
     }
     
-    council_room_effect(thisPlayer, &testG, handpos);
+    result = council_room_effect(thisPlayer, &testG, handpos);
     
     printf("hand count = %d, expected = %d\n", testG.handCount[thisPlayer], G.handCount[thisPlayer] + 3);
     
@@ -224,7 +227,7 @@ int main() {
     MYASSERT(testG.playedCardCount == G.playedCardCount + 1, "Played card count test");
     MYASSERT(testG.playedCards[testG.playedCardCount - 1] == council_room, "Played card last added test");
     MYASSERT(testG.numBuys == G.numBuys + 1, "Num Buys increased test");
-
+    MYASSERT(result == 0, "Return val is 0");
     
     
 	printf("\n >>>>> Testing complete %s <<<<<\n\n", TESTCARD);

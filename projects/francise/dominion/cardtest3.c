@@ -74,7 +74,7 @@ int main() {
     
     choice2 = silver;
     
-    mine_effect(&testG, choice1, choice2, thisPlayer, handpos);
+    int result = mine_effect(&testG, choice1, choice2, thisPlayer, handpos);
 
 	printf("hand count = %d, expected = %d\n", testG.handCount[thisPlayer], G.handCount[thisPlayer] - 1);
     
@@ -118,6 +118,8 @@ int main() {
     MYASSERT(handendingchoice2 == handstartingchoice2 + 1, "Choice2 in hand increased by 1 test");
     
     MYASSERT(testG.supplyCount[choice2] == G.supplyCount[choice2] - 1, "Choice2 in supply decreased by 1 test");
+    
+    MYASSERT(result == 0, "Return val is 0");
     
     
     
@@ -433,7 +435,7 @@ int main() {
     // copy the game state to a test case
     memcpy(&testG, &G, sizeof(struct gameState));
     
-    mine_effect(&testG, choice1, choice2, thisPlayer, handpos);
+    result = mine_effect(&testG, choice1, choice2, thisPlayer, handpos);
     
     printf("hand count = %d, expected = %d\n", testG.handCount[thisPlayer], G.handCount[thisPlayer] - 1);
     
@@ -477,6 +479,8 @@ int main() {
     MYASSERT(handendingchoice2 == handstartingchoice2 + 1, "Choice2 in hand increased by 1 test");
     
     MYASSERT(testG.supplyCount[choice2] == G.supplyCount[choice2] - 1, "Choice2 in supply decreased by 1 test");
+    
+    MYASSERT(result == 0, "Return val is 0");
 
 
     // ----------- TEST 8:  --------------
@@ -493,7 +497,7 @@ int main() {
     
     choice2 = silver;
     
-    mine_effect(&testG, choice1, choice2, thisPlayer, handpos);
+    result = mine_effect(&testG, choice1, choice2, thisPlayer, handpos);
     
     printf("hand count = %d, expected = %d\n", testG.handCount[thisPlayer], G.handCount[thisPlayer] - 1);
     
@@ -537,6 +541,8 @@ int main() {
     MYASSERT(handendingchoice2 == handstartingchoice2 + 1, "Choice2 in hand increased by 1 test");
     
     MYASSERT(testG.supplyCount[choice2] == G.supplyCount[choice2] - 1, "Choice2 in supply decreased by 1 test");
+    
+    MYASSERT(result == 0, "Return val is 0");
     
     
 	printf("\n >>>>> Testing complete %s <<<<<\n\n", TESTCARD);

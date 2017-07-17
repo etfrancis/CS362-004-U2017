@@ -64,7 +64,7 @@ int main() {
 	// copy the game state to a test case
 	memcpy(&testG, &G, sizeof(struct gameState));
     
-    smithy_effect(thisPlayer, handpos, &testG);
+    int result = smithy_effect(thisPlayer, handpos, &testG);
 
 	printf("hand count = %d, expected = %d\n", testG.handCount[thisPlayer], G.handCount[thisPlayer] + 2);
 	printf("deck count = %d, expected = %d\n", testG.deckCount[thisPlayer], G.deckCount[thisPlayer] - 3);
@@ -74,6 +74,7 @@ int main() {
     MYASSERT(testG.deckCount[thisPlayer] == G.deckCount[thisPlayer] - 3, "Deck count test");
 	MYASSERT(testG.playedCardCount == G.playedCardCount + 1, "Played card count test");
     MYASSERT(testG.playedCards[testG.playedCardCount -1] == smithy, "Played card last added test");
+    MYASSERT(result == 0, "Return val is 0");
     
     // ----------- TEST 2:  --------------
     printf("\nTEST 2: Using deck with no cards in it\n");
@@ -83,7 +84,7 @@ int main() {
     memcpy(&testG, &G, sizeof(struct gameState));
     testG.deckCount[thisPlayer] = 0; //set deck size to 0
     
-    smithy_effect(thisPlayer, handpos, &testG);
+    result = smithy_effect(thisPlayer, handpos, &testG);
     
     printf("hand count = %d, expected = %d\n", testG.handCount[thisPlayer], G.handCount[thisPlayer]);
     printf("deck count = %d, expected = %d\n", testG.deckCount[thisPlayer], G.deckCount[thisPlayer]);
@@ -93,6 +94,7 @@ int main() {
     MYASSERT(testG.deckCount[thisPlayer] == 0, "Deck count test");
     MYASSERT(testG.playedCardCount == G.playedCardCount + 1, "Played card count test");
     MYASSERT(testG.playedCards[testG.playedCardCount -1] == smithy, "Played card last added test");
+    MYASSERT(result == 0, "Return val is 0");
            
 
            
@@ -104,7 +106,7 @@ int main() {
     memcpy(&testG, &G, sizeof(struct gameState));
     testG.deckCount[thisPlayer] = 2; //set deck size to 2
            
-    smithy_effect(thisPlayer, handpos, &testG);
+    result = smithy_effect(thisPlayer, handpos, &testG);
            
     printf("hand count = %d, expected = %d\n", testG.handCount[thisPlayer], G.handCount[thisPlayer] +1);
     printf("deck count = %d, expected = %d\n", testG.deckCount[thisPlayer], 0);
@@ -114,6 +116,7 @@ int main() {
     MYASSERT(testG.deckCount[thisPlayer] == 0, "Deck count test");
     MYASSERT(testG.playedCardCount == G.playedCardCount + 1, "Played card count test");
     MYASSERT(testG.playedCards[testG.playedCardCount -1] == smithy, "Played card last added test");
+    MYASSERT(result == 0, "Return val is 0");
            
            
     // ----------- TEST 4:  --------------
@@ -124,7 +127,7 @@ int main() {
     memcpy(&testG, &G, sizeof(struct gameState));
     testG.deckCount[thisPlayer] = 3; //set deck size to 3
            
-    smithy_effect(thisPlayer, handpos, &testG);
+    result = smithy_effect(thisPlayer, handpos, &testG);
            
     printf("hand count = %d, expected = %d\n", testG.handCount[thisPlayer], G.handCount[thisPlayer] + 2);
     printf("deck count = %d, expected = %d\n", testG.deckCount[thisPlayer], 0);
@@ -134,18 +137,19 @@ int main() {
     MYASSERT(testG.deckCount[thisPlayer] == 0, "Deck count test");
     MYASSERT(testG.playedCardCount == G.playedCardCount + 1, "Played card count test");
     MYASSERT(testG.playedCards[testG.playedCardCount -1] == smithy, "Played card last added test");
+    MYASSERT(result == 0, "Return val is 0");
            
 
            
-    // ----------- TEST 4:  --------------
-    printf("\nTEST 4: Using deck with four cards in it\n");
+    // ----------- TEST 5:  --------------
+    printf("\nTEST 5: Using deck with four cards in it\n");
            
            
     // copy the game state to a test case
     memcpy(&testG, &G, sizeof(struct gameState));
     testG.deckCount[thisPlayer] = 4; //set deck size to 4
            
-    smithy_effect(thisPlayer, handpos, &testG);
+    result = smithy_effect(thisPlayer, handpos, &testG);
            
     printf("hand count = %d, expected = %d\n", testG.handCount[thisPlayer], G.handCount[thisPlayer] + 2);
     printf("deck count = %d, expected = %d\n", testG.deckCount[thisPlayer], 1);
@@ -155,6 +159,7 @@ int main() {
     MYASSERT(testG.deckCount[thisPlayer] == 1, "Deck count test");
     MYASSERT(testG.playedCardCount == G.playedCardCount + 1, "Played card count test");
     MYASSERT(testG.playedCards[testG.playedCardCount -1] == smithy, "Played card last added test");
+    MYASSERT(result == 0, "Return val is 0");
     
     
 	printf("\n >>>>> Testing complete %s <<<<<\n\n", TESTCARD);

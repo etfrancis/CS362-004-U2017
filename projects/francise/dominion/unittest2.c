@@ -88,6 +88,7 @@ int main() {
         MYASSERT(startingCards[i] == postCards[i], "Deck contents identical test");
     }
     
+    
     // ----------- TEST 2:  --------------
     printf("\nTEST 2: Empty deck \n");
     
@@ -98,6 +99,7 @@ int main() {
     result = shuffle(thisPlayer, &testG);
     printf("result = %d, expected = %d\n", result, -1);
     MYASSERT(result == -1, "Function returns -1 when shuffling empty deck");
+    
     
     // ----------- TEST 3:  --------------
     printf("\nTEST 3: Full deck from starting conditions -- show that other decks  are unaffected\n");
