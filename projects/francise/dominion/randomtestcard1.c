@@ -259,7 +259,7 @@ int main() {
     int handpos = G.handCount[thisPlayer] -1;
     
     
-	printf("\n----------------- Testing Card: %s ----------------\n", TESTCARD);
+	printf("\n----------------- Testing Card: %s, Trial %d ----------------\n", TESTCARD, i);
 
 	// copy the game state to a test case
 	memcpy(&testG, &G, sizeof(struct gameState));

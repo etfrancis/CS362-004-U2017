@@ -76,11 +76,12 @@ testsuite: cardtest1 cardtest2 cardtest3 cardtest4 unittest1 unittest2 unittest3
 	cat dominion.c.gcov >> unittestresult.out
 
 randomsuite: randomtestcard1 randomtestcard2 randomtestcard3
-	./randomtestcard1 &> randomtestresult.out
-	./randomtestcard2 >> randomtestresult.out
-	./randomtestcard3 >> randomtestresult.out
-	gcov -b dominion.c >> randomtestresult.out
-	cat dominion.c.gcov >> randomtestresult.out
+	./randomtestcard1 &> randomtestcard1.out
+	./randomtestcard2 &> randomtestcard2.out
+	./randomtestcard3 &> randomtestadventurer.out
+	gcov -b dominion.c | tee -a randomtestcard1.out randomtestcard2.out randomtestadventurer.out
+	cat dominion.c.gcov | tee -a randomtestcard1.out randomtestcard2.out randomtestadventurer.out
+
 
 player: player.c interface.o
 	gcc -o player player.c -g  dominion.o rngs.o interface.o $(CFLAGS)
