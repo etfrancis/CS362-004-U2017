@@ -1,4 +1,4 @@
-CFLAGS = -Wall -fpic -lm -fprofile-arcs -ftest-coverage
+CFLAGS = -std=c99  -Wall -fpic -lm -fprofile-arcs -ftest-coverage
 
 
 cardtest1: cardtest1.c dominion.c rngs.o
