@@ -320,11 +320,13 @@ int main() {
     if(G.deckCount[thisPlayer] + G.discardCount[thisPlayer] >= 2 && deckTreasure >= 2){
         printf("\nTest Case: %s\n", "Deck and discard total at least 2, deck treasure at least 2");
         printf("hand count = %d, expected = %d\n", testG.handCount[thisPlayer], G.handCount[thisPlayer] + 1);
-        for(int i = 1; i < numPlayers; i++)
-            printf("hand count for other player %d = %d, expected = %d\n", i, testG.handCount[i], G.handCount[i]);
+        for(int i = 0; i < numPlayers; i++)
+            if(i != thisPlayer)
+            	printf("hand count for other player %d = %d, expected = %d\n", i, testG.handCount[i], G.handCount[i]);
         printf("deck and discard count total for current player = %d, expected = %d\n",  testG.deckCount[thisPlayer] + testG.discardCount[thisPlayer], G.deckCount[thisPlayer] + G.discardCount[thisPlayer] - 2);
-        for(int i = 1; i < numPlayers; i++)
-            printf("deck and discard count total for other player %d = %d, expected = %d\n", i, testG.deckCount[i] + testG.discardCount[i], G.discardCount[i] + G.deckCount[i]);
+        for(int i = 0; i < numPlayers; i++)
+            if(i != thisPlayer)
+            	printf("deck and discard count total for other player %d = %d, expected = %d\n", i, testG.deckCount[i] + testG.discardCount[i], G.discardCount[i] + G.deckCount[i]);
         printf("ending played card count = %d, expected = %d\n", testG.playedCardCount, G.playedCardCount + 1);
         printf("ending played card is adventurer = %d, expected = %d\n", testG.playedCards[testG.playedCardCount -1], adventurer);
         printf("ending hand treasure = %d, expected %d\n", endingHandTreasure, handTreasure + 2);
@@ -332,11 +334,13 @@ int main() {
         
         
         MYASSERT(testG.handCount[thisPlayer] == G.handCount[thisPlayer] + 1, "Hand count test");
-        for(int i = 1; i < numPlayers; i++)
-            MYASSERT(testG.handCount[i] == G.handCount[i], "Other player handcount same test");
+        for(int i = 0; i < numPlayers; i++)
+            if(i != thisPlayer)
+            	MYASSERT(testG.handCount[i] == G.handCount[i], "Other player handcount same test");
         MYASSERT(testG.deckCount[thisPlayer] + testG.discardCount[thisPlayer] == G.deckCount[thisPlayer] + G.discardCount[thisPlayer] -2, "Deck and discard total count test");
-        for(int i = 1; i < numPlayers; i++)
-            MYASSERT(testG.deckCount[i] + testG.discardCount[i] == G.deckCount[i] + G.discardCount[i], "Other player deck and discard same test");
+        for(int i = 0; i < numPlayers; i++)
+            if(i != thisPlayer)
+            	MYASSERT(testG.deckCount[i] + testG.discardCount[i] == G.deckCount[i] + G.discardCount[i], "Other player deck and discard same test");
         
         MYASSERT(testG.playedCardCount == G.playedCardCount + 1, "Played card count test");
         MYASSERT(testG.playedCards[testG.playedCardCount - 1] == adventurer, "Played card last added test");
@@ -348,29 +352,27 @@ int main() {
     //case 2: deck and discard total == 1, deck treasure == 1
     else if(G.deckCount[thisPlayer] + G.discardCount[thisPlayer] == 1  && deckTreasure == 1){
         printf("\nTest Case: %s\n", "Deck and discard total == 1, deck treasure == 1");
-        printf("hand count = %d, expected = %d\n", testG.handCount[thisPlayer], G.handCount[thisPlayer] + 1);
-        for(int i = 1; i < numPlayers; i++)
-            printf("hand count for other player %d = %d, expected = %d\n", i, testG.handCount[i], G.handCount[i]);
+        printf("hand count = %d, expected = %d\n", testG.handCount[thisPlayer], G.handCount[thisPlayer]);
+        for(int i = 0; i < numPlayers; i++)
+            if(i != thisPlayer)
+            	printf("hand count for other player %d = %d, expected = %d\n", i, testG.handCount[i], G.handCount[i]);
         printf("deck and discard count for current player = %d, expected = %d\n",  testG.deckCount[thisPlayer] + testG.discardCount[thisPlayer], G.deckCount[thisPlayer] + G.discardCount[thisPlayer] - 1);
-        for(int i = 1; i < numPlayers; i++)
-            printf("deck and discard count for other player %d = %d, expected = %d\n", i, testG.deckCount[i] + testG.discardCount[i], G.discardCount[i] + G.deckCount[i]);
+        for(int i = 0; i < numPlayers; i++)
+            if(i != thisPlayer)
+            	printf("deck and discard count for other player %d = %d, expected = %d\n", i, testG.deckCount[i] + testG.discardCount[i], G.discardCount[i] + G.deckCount[i]);
         printf("ending played card count = %d, expected = %d\n", testG.playedCardCount, G.playedCardCount + 1);
         printf("ending played card is adventurer = %d, expected = %d\n", testG.playedCards[testG.playedCardCount -1], adventurer);
         printf("ending hand treasure = %d, expected %d\n", endingHandTreasure, handTreasure + 1);
         printf("ending deck and discard treasure = %d, expected %d\n", endingDeckTreasure, deckTreasure - 1);
         
-        if(G.deck[thisPlayer][0] == copper || G.deck[thisPlayer][0] == silver || G.deck[thisPlayer][0] == gold)
-        	MYASSERT(testG.handCount[thisPlayer] == G.handCount[thisPlayer] + 1, "Hand count test");
-        else
-            MYASSERT(testG.handCount[thisPlayer] == G.handCount[thisPlayer], "Hand count test");
-        for(int i = 1; i < numPlayers; i++)
-            MYASSERT(testG.handCount[i] == G.handCount[i], "Other player handcount same test");
-        if(G.deck[thisPlayer][0] == copper || G.deck[thisPlayer][0] == silver || G.deck[thisPlayer][0] == gold)
-        	MYASSERT(testG.deckCount[thisPlayer] + testG.discardCount[thisPlayer] == G.deckCount[thisPlayer] + G.discardCount[thisPlayer] - 1, "Deck plus discard count test");
-    	else
-        	MYASSERT(testG.deckCount[thisPlayer] + testG.discardCount[thisPlayer] == G.deckCount[thisPlayer] + G.discardCount[thisPlayer], "Deck plus discard count test");
-        for(int i = 1; i < numPlayers; i++)
-            MYASSERT(testG.deckCount[i] + testG.discardCount[i] == G.deckCount[i] + G.discardCount[i], "Other player deckcount same test");
+        MYASSERT(testG.handCount[thisPlayer] == G.handCount[thisPlayer], "Hand count test");
+        for(int i = 0; i < numPlayers; i++)
+            if(i != thisPlayer)
+            	MYASSERT(testG.handCount[i] == G.handCount[i], "Other player handcount same test");
+        MYASSERT(testG.deckCount[thisPlayer] + testG.discardCount[thisPlayer] == G.deckCount[thisPlayer] + G.discardCount[thisPlayer] - 1, "Deck plus discard count test");
+        for(int i = 0; i < numPlayers; i++)
+            if(i != thisPlayer)
+            	MYASSERT(testG.deckCount[i] + testG.discardCount[i] == G.deckCount[i] + G.discardCount[i], "Other player deckcount same test");
         MYASSERT(testG.playedCardCount == G.playedCardCount + 1, "Played card count test");
         MYASSERT(testG.playedCards[testG.playedCardCount - 1] == adventurer, "Played card last added test");
         MYASSERT(result == 0, "Return val is 0");
@@ -381,23 +383,27 @@ int main() {
     //case 3: deck and discard total == 0, deck treasure == 0
     else if(G.deckCount[thisPlayer] + G.discardCount[thisPlayer] == 0){
         printf("\nTest Case: %s\n", "Deck and discard total == 0");
-            printf("hand count = %d, expected = %d\n", testG.handCount[thisPlayer], G.handCount[thisPlayer]);
-        for(int i = 1; i < numPlayers; i++)
-            printf("hand count for other player %d = %d, expected = %d\n", i, testG.handCount[i], G.handCount[i]);
+        printf("hand count = %d, expected = %d\n", testG.handCount[thisPlayer], G.handCount[thisPlayer] -1);
+        for(int i = 0; i < numPlayers; i++)
+            if(i != thisPlayer)
+            	printf("hand count for other player %d = %d, expected = %d\n", i, testG.handCount[i], G.handCount[i]);
         printf("deck and discard count for current player = %d, expected = %d\n",  testG.deckCount[thisPlayer] + testG.discardCount[thisPlayer], G.deckCount[thisPlayer] + G.discardCount[thisPlayer]);
-        for(int i = 1; i < numPlayers; i++)
-            printf("deck and discard count for other player %d = %d, expected = %d\n", i, testG.deckCount[i] + testG.discardCount[i], G.discardCount[i] + G.deckCount[i]);
+        for(int i = 0; i < numPlayers; i++)
+            if(i != thisPlayer)
+            	printf("deck and discard count for other player %d = %d, expected = %d\n", i, testG.deckCount[i] + testG.discardCount[i], G.discardCount[i] + G.deckCount[i]);
         printf("ending played card count = %d, expected = %d\n", testG.playedCardCount, G.playedCardCount + 1);
         printf("ending played card is adventurer = %d, expected = %d\n", testG.playedCards[testG.playedCardCount -1], adventurer);
         printf("ending hand treasure = %d, expected %d\n", endingHandTreasure, handTreasure);
         printf("ending deck and discard treasure = %d, expected %d\n", endingDeckTreasure, deckTreasure);
         
-        MYASSERT(testG.handCount[thisPlayer] == G.handCount[thisPlayer], "Hand count test");
-        for(int i = 1; i < numPlayers; i++)
-            MYASSERT(testG.handCount[i] == G.handCount[i], "Other player handcount same test");
+        MYASSERT(testG.handCount[thisPlayer] == G.handCount[thisPlayer] -1, "Hand count test");
+        for(int i = 0; i < numPlayers; i++)
+            if(i != thisPlayer)
+            	MYASSERT(testG.handCount[i] == G.handCount[i], "Other player handcount same test");
         MYASSERT(testG.deckCount[thisPlayer] + testG.discardCount[thisPlayer] == G.deckCount[thisPlayer] + G.discardCount[thisPlayer], "Deck plus discard count test");
-        for(int i = 1; i < numPlayers; i++)
-            MYASSERT(testG.deckCount[i] + testG.discardCount[i] == G.deckCount[i] + G.discardCount[i], "Other player deckcount same test");
+        for(int i = 0; i < numPlayers; i++)
+            if(i != thisPlayer)
+            	MYASSERT(testG.deckCount[i] + testG.discardCount[i] == G.deckCount[i] + G.discardCount[i], "Other player deckcount same test");
         MYASSERT(testG.playedCardCount == G.playedCardCount + 1, "Played card count test");
         MYASSERT(testG.playedCards[testG.playedCardCount - 1] == adventurer, "Played card last added test");
         MYASSERT(result == 0, "Return val is 0");
@@ -409,22 +415,26 @@ int main() {
     else if(G.deckCount[thisPlayer] + G.discardCount[thisPlayer] >= 2 && deckTreasure == 1){
             printf("\nTest Case: %s\n", "Deck and discard total >= 2, deck treasure == 1");
             printf("hand count = %d, expected = %d\n", testG.handCount[thisPlayer], G.handCount[thisPlayer]);
-            for(int i = 1; i < numPlayers; i++)
-                printf("hand count for other player %d = %d, expected = %d\n", i, testG.handCount[i], G.handCount[i]);
+            for(int i = 0; i < numPlayers; i++)
+                if(i != thisPlayer)
+                	printf("hand count for other player %d = %d, expected = %d\n", i, testG.handCount[i], G.handCount[i]);
             printf("deck and discard count total for current player = %d, expected = %d\n",  testG.deckCount[thisPlayer] + testG.discardCount[thisPlayer], G.deckCount[thisPlayer] + G.discardCount[thisPlayer] - 1);
-            for(int i = 1; i < numPlayers; i++)
-                printf("deck and discard count total for other player %d = %d, expected = %d\n", i, testG.deckCount[i] + testG.discardCount[i], G.discardCount[i] + G.deckCount[i]);
+            for(int i = 0; i < numPlayers; i++)
+                if(i != thisPlayer)
+                	printf("deck and discard count total for other player %d = %d, expected = %d\n", i, testG.deckCount[i] + testG.discardCount[i], G.discardCount[i] + G.deckCount[i]);
             printf("ending played card count = %d, expected = %d\n", testG.playedCardCount, G.playedCardCount + 1);
             printf("ending played card is adventurer = %d, expected = %d\n", testG.playedCards[testG.playedCardCount -1], adventurer);
             printf("ending hand treasure = %d, expected %d\n", endingHandTreasure, handTreasure + 1);
             printf("ending deck and discard treasure = %d, expected %d\n", endingDeckTreasure, deckTreasure - 1);
         
             MYASSERT(testG.handCount[thisPlayer] == G.handCount[thisPlayer], "Hand count test");
-            for(int i = 1; i < numPlayers; i++)
-                MYASSERT(testG.handCount[i] == G.handCount[i], "Other player handcount same test");
+            for(int i = 0; i < numPlayers; i++)
+                if(i != thisPlayer)
+                	MYASSERT(testG.handCount[i] == G.handCount[i], "Other player handcount same test");
             MYASSERT(testG.deckCount[thisPlayer] + testG.discardCount[thisPlayer] == G.deckCount[thisPlayer] + G.discardCount[thisPlayer] -1, "Deck and discard total count test");
-            for(int i = 1; i < numPlayers; i++)
-                MYASSERT(testG.deckCount[i] + testG.discardCount[i] == G.deckCount[i] + G.discardCount[i], "Other player deck and discard same test");
+            for(int i = 0; i < numPlayers; i++)
+                if(i != thisPlayer)
+                	MYASSERT(testG.deckCount[i] + testG.discardCount[i] == G.deckCount[i] + G.discardCount[i], "Other player deck and discard same test");
     
             MYASSERT(testG.playedCardCount == G.playedCardCount + 1, "Played card count test");
             MYASSERT(testG.playedCards[testG.playedCardCount - 1] == adventurer, "Played card last added test");
@@ -437,23 +447,27 @@ int main() {
     //case 5: deck and discard total >= 2, deck treasure == 0
     else if(G.deckCount[thisPlayer] + G.discardCount[thisPlayer] >= 2 && deckTreasure == 0){
         printf("\nTest Case: %s\n", "Deck and discard total >= 2, deck treasure == 0");
-        printf("hand count = %d, expected = %d\n", testG.handCount[thisPlayer], G.handCount[thisPlayer]);
-        for(int i = 1; i < numPlayers; i++)
-            printf("hand count for other player %d = %d, expected = %d\n", i, testG.handCount[i], G.handCount[i] -1);
+        printf("hand count = %d, expected = %d\n", testG.handCount[thisPlayer], G.handCount[thisPlayer] -1);
+        for(int i = 0; i < numPlayers; i++)
+            if(i != thisPlayer)
+            	printf("hand count for other player %d = %d, expected = %d\n", i, testG.handCount[i], G.handCount[i] -1);
         printf("deck and discard count total for current player = %d, expected = %d\n",  testG.deckCount[thisPlayer] + testG.discardCount[thisPlayer], G.deckCount[thisPlayer] + G.discardCount[thisPlayer]);
-        for(int i = 1; i < numPlayers; i++)
-            printf("deck and discard count total for other player %d = %d, expected = %d\n", i, testG.deckCount[i] + testG.discardCount[i], G.discardCount[i] + G.deckCount[i]);
+        for(int i = 0; i < numPlayers; i++)
+            if(i != thisPlayer)
+            	printf("deck and discard count total for other player %d = %d, expected = %d\n", i, testG.deckCount[i] + testG.discardCount[i], G.discardCount[i] + G.deckCount[i]);
         printf("ending played card count = %d, expected = %d\n", testG.playedCardCount, G.playedCardCount + 1);
         printf("ending played card is adventurer = %d, expected = %d\n", testG.playedCards[testG.playedCardCount -1], adventurer);
         printf("ending hand treasure = %d, expected %d\n", endingHandTreasure, handTreasure);
         printf("ending deck and discard treasure = %d, expected %d\n", endingDeckTreasure, deckTreasure);
         
         MYASSERT(testG.handCount[thisPlayer] == G.handCount[thisPlayer] - 1, "Hand count test");
-        for(int i = 1; i < numPlayers; i++)
-            MYASSERT(testG.handCount[i] == G.handCount[i], "Other player handcount same test");
+        for(int i = 0; i < numPlayers; i++)
+            if(i != thisPlayer)
+            	MYASSERT(testG.handCount[i] == G.handCount[i], "Other player handcount same test");
         MYASSERT(testG.deckCount[thisPlayer] + testG.discardCount[thisPlayer] == G.deckCount[thisPlayer] + G.discardCount[thisPlayer], "Deck and discard total count test");
-        for(int i = 1; i < numPlayers; i++)
-            MYASSERT(testG.deckCount[i] + testG.discardCount[i] == G.deckCount[i] + G.discardCount[i], "Other player deck and discard same test");
+        for(int i = 0; i < numPlayers; i++)
+            if(i != thisPlayer)
+            	MYASSERT(testG.deckCount[i] + testG.discardCount[i] == G.deckCount[i] + G.discardCount[i], "Other player deck and discard same test");
         
         MYASSERT(testG.playedCardCount == G.playedCardCount + 1, "Played card count test");
         MYASSERT(testG.playedCards[testG.playedCardCount - 1] == adventurer, "Played card last added test");

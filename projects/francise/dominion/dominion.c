@@ -1242,6 +1242,9 @@ int updateCoins(int player, struct gameState *state, int bonus)
   return 0;
 }
 
+
+/*Functions with bugs in them*/
+
 int adventurer_effect(int drawntreasure, int currentPlayer, int cardDrawn, int z, int* temphand, struct gameState *state, int handPos){
     while(drawntreasure < 4){ //bug, increased treasure from 2 to 4
         if(state->deckCount[currentPlayer] < 1){
@@ -1263,6 +1266,7 @@ int adventurer_effect(int drawntreasure, int currentPlayer, int cardDrawn, int z
     }
     return 0;
 }
+
 
 int council_room_effect(int currentPlayer, struct gameState *state, int handPos){
     
@@ -1353,5 +1357,137 @@ int mine_effect(struct gameState* state, int choice1, int choice2, int currentPl
 
 
 
+/*"Fixed" versions of the card functions, modified to address caught bugs*/
+/*
+int adventurer_effect(int drawntreasure, int currentPlayer, int cardDrawn, int z, int* temphand, struct gameState *state, int handPos){
+    int shuffle_count = 0;
+    while(drawntreasure < 2 && shuffle_count < 2){ //bug, increased treasure from 2 to 4
+        if(state->deckCount[currentPlayer] < 1){
+            //Step 1 Shuffle the discard pile back into a deck //responds to bug identified by test suite section 2
+            int i;
+            //Move discard to deck
+            for (i = 0; i < state->discardCount[currentPlayer];i++){
+                state->deck[currentPlayer][i] = state->discard[currentPlayer][i];
+                state->discard[currentPlayer][i] = -1;
+            }
+            
+            state->deckCount[currentPlayer] = state->discardCount[currentPlayer];
+            state->discardCount[currentPlayer] = 0;//Reset discard
+            
+            
+            shuffle(currentPlayer, state);
+            shuffle_count++;
+        }
+        int result = drawCard(currentPlayer, state);
+        cardDrawn = state->hand[currentPlayer][state->handCount[currentPlayer]-1];//top card of hand is most recently drawn card.
+        if (cardDrawn == copper || cardDrawn == silver || cardDrawn == gold){
+            drawntreasure++;}
+        else{
+            if(result != -1){
+                temphand[z]=cardDrawn;
+                state->handCount[currentPlayer]--; //this should just remove the top card (the most recently drawn one).
+                z++;}
+        }
+    }
+    while(z-1>=0){
+        state->discard[currentPlayer][state->discardCount[currentPlayer]++]=temphand[z-1]; // discard all cards in play that have been drawn
+        z=z-1;
+    }
+    
+    //discard card from hand
+    discardCard(handPos, currentPlayer, state, 0);
+    return 0;
+}
+
+
+int council_room_effect(int currentPlayer, struct gameState *state, int handPos){
+    
+    //+4 Cards
+    for (int i = 0; i < 4; i++)
+    {
+        drawCard(currentPlayer, state);
+    }
+    
+    //+1 Buy
+    state->numBuys++;
+    
+    //Each other player draws a card
+    for (int i = 0; i < state->numPlayers; i++)
+    {
+        if ( i != currentPlayer )
+        {
+            drawCard(i, state);
+            //drawCard(i, state); //bug - added additional card draw for other players
+        }
+    }
+    
+    //put played card in played card pile
+    discardCard(handPos, currentPlayer, state, 0);
+    
+    return 0;
+}
+
+int smithy_effect(int currentPlayer, int handPos, struct gameState *state){
+    //+3 Cards
+    for (int i = 0; i < 3; i++) //bug, increased boundary from 3 to 4
+    {
+        drawCard(currentPlayer, state);
+    }
+    
+    //discard card from hand
+    discardCard(handPos, currentPlayer, state, 0);
+    return 0;
+}
+
+
+int village_effect(int currentPlayer, struct gameState* state, int handPos){
+    //+1 Card
+    drawCard(currentPlayer, state);
+    
+    //+2 Actions
+    state->numActions = state->numActions + 2;
+    
+    //discard played card from hand
+    discardCard(handPos, currentPlayer, state, 0);
+    return 0;}
+
+
+int mine_effect(struct gameState* state, int choice1, int choice2, int currentPlayer, int handPos){
+    int j = state->hand[currentPlayer][choice1];  //store card we will trash
+    
+    if (state->hand[currentPlayer][choice1] < copper || state->hand[currentPlayer][choice1] > gold) //bug, reversed inequality signs
+    {
+        return -1;
+    }
+    
+    if (choice2 > gold || choice2 < copper) //bug, needed to limit to treasure cards
+    {
+        return -1;
+    }
+    
+    if ( (getCost(state->hand[currentPlayer][choice1]) + 3) < getCost(choice2) ) //bug, needed to reverse signs
+    {
+        return -1;
+    }
+    
+    gainCard(choice2, state, 2, currentPlayer);
+    
+    //discard card from hand
+    discardCard(handPos, currentPlayer, state, 0);
+    
+    //discard trashed card
+    for (int i = 0; i < state->handCount[currentPlayer]; i++)
+    {
+        if (state->hand[currentPlayer][i] == j)
+        {
+            discardCard(choice1, currentPlayer, state, 1); // fixed bug to trash card rather than move to played
+            break;
+        }
+    }
+    
+    return 0;}
+
+
+*/
 
 //end of dominion.c

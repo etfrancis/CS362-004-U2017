@@ -273,7 +273,7 @@ int main() {
     	printf("ending played card count = %d, expected = %d\n", testG.playedCardCount, G.playedCardCount + 1);
     
     	MYASSERT(testG.handCount[thisPlayer] == G.handCount[thisPlayer] + 2, "Hand count test");
-    	MYASSERT(testG.deckCount[thisPlayer] + G.discardCount[thisPlayer] == G.deckCount[thisPlayer] + G.discardCount[thisPlayer] - 3, "Deck count test");
+    	MYASSERT(testG.deckCount[thisPlayer] + testG.discardCount[thisPlayer] == G.deckCount[thisPlayer] + G.discardCount[thisPlayer] - 3, "Deck count test");
 		MYASSERT(testG.playedCardCount == G.playedCardCount + 1, "Played card count test");
     	MYASSERT(testG.playedCards[testG.playedCardCount -1] == smithy, "Played card last added test");
     	MYASSERT(result == 0, "Return val is 0");
@@ -304,11 +304,11 @@ int main() {
     }
     else if(G.deckCount[thisPlayer] + G.discardCount[thisPlayer] == 0){
         printf("\nTest Case: %s\n", "Deck and discard sum equals 0");
-        printf("hand count = %d, expected = %d\n", testG.handCount[thisPlayer], G.handCount[thisPlayer] + 0);
+        printf("hand count = %d, expected = %d\n", testG.handCount[thisPlayer], G.handCount[thisPlayer] -1 );
         printf("deck count = %d, expected = %d\n", testG.deckCount[thisPlayer] + testG.discardCount[thisPlayer], G.deckCount[thisPlayer] + G.discardCount[thisPlayer] + 0);
         printf("ending played card count = %d, expected = %d\n", testG.playedCardCount, G.playedCardCount + 1);
         
-        MYASSERT(testG.handCount[thisPlayer] == G.handCount[thisPlayer] + 0, "Hand count test");
+        MYASSERT(testG.handCount[thisPlayer] == G.handCount[thisPlayer] -1 , "Hand count test");
         MYASSERT(testG.deckCount[thisPlayer] + testG.discardCount[thisPlayer] == G.deckCount[thisPlayer] + G.discardCount[thisPlayer] + 0, "Deck count test");
         MYASSERT(testG.playedCardCount == G.playedCardCount + 1, "Played card count test");
         MYASSERT(testG.playedCards[testG.playedCardCount -1] == smithy, "Played card last added test");
