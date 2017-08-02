@@ -1,0 +1,111 @@
+Edward Francis
+OSU ID: 932974534
+CS 362: Software Engineering II
+Assignment 5 – Bug Reports
+August 2, 2017
+
+Bug reports
+The following two bug reports describe bugs found in the dominion.c card implementation for "smithy" in my teammate's Dominion code
+
+Bug Report #1
+Bug 1: Smithy card discards two cards instead of one
+Summary: There is a bug in the Smithy card implementation, which causes the current player to discard an additional card from their hand, in addition to the Smithy card, after playing Smithy.
+
+Observation:
+The bug can be observed by playing the Smithy card under normal game conditions with an adequate deck and at least one other card besides Smithy in the player’s hand. It is most observable when there are no other Smithy cards in the player’s hand, for example with a starting hand of six cards, with Smithy card in the final hand position and a deck with five cards available to draw:
+
+1)	Call the Dominion “initializeGame” function, which assigns each player 3 estates, 7 coppers, a starting hand comprised of 5 of these cards, and a starting deck comprised of five of these cards;
+2)	Call gainCard with the parameters necessary to add a smithy card from the source pile to the current player’s hand;
+3)	Set a hand position variable to indicate the position of smithy in the player’s hand.
+4)	Copy the starting game state to create a new game state that will be modified by playing Smithy;
+5)	Play Smithy with the current player, new game state, and hand position of Smithy as input parameters;
+6)	After playing Smithy, compare the game state’s “played_card_count” value to the game state’s played_card_count value prior to calling Smithy, and also (optionally) compare the value of the last played card indicated in the game state playedCards array to “smithy”, to see the discrepancy between expected and actual results.
+
+//initialize general game variables
+    		int handpos = -1;
+    		int seed = 2;
+    		int numPlayers = 2;
+    		int thisPlayer = 0;
+		struct gameState G, testG;
+		int k[10] = {adventurer, embargo, village, minion, mine, cutpurse,
+			sea_hag, tribute, smithy, council_room};
+
+	// initialize a game state and player cards. Add smithy to hand.
+initializeGame(numPlayers, k, seed, &G);
+gainCard(smithy, &G, 2, thisPlayer);
+handpos = G.handCount[thisPlayer] -1;
+memcpy(&testG, &G, sizeof(struct gameState));
+    		int result = playSmithy(thisPlayer, &testG, handpos);
+
+printf("ending played card count = %d, expected = %d\n", testG.playedCardCount, G.playedCardCount + 1);
+MYASSERT(testG.playedCardCount == G.playedCardCount + 1, "Played card count");
+MYASSERT(testG.playedCards[testG.playedCardCount - 1] == smithy, "Played card last added");
+
+This test shows that two cards, rather than one card, are discarded to the played cards pile after playing Smithy, and that the most recently played card is not Smithy but the card adjacent to it in the current player’s hand.
+
+Cause and remedy: Examining my teammate’s Dominion code, it can be seen that this bug is caused by an additional discard operation in the refactored card function, which causes the card next to Smithy in the player’s hand to also be discarded:
+
+    //discard card from hand
+    discardCard(handPos, currentPlayer, state, 0);
+    discardCard(handPos-1, currentPlayer, state, 0);
+
+This bug can be fixed by removing the second discardCard operation from the function.
+
+Version: This bug was detected on the most recent version of my teammate’s Dominion implementation in the project file dominion.c.
+
+Severity: This is a relatively high severity bug, because it could quickly lead gameplay to become distorted and seriously impact the integrity of a game. It also appears that the bug may lead to a segmentation fault if the card is played at a time when it is the only card in the player’s hand.
+Priority: This is a relatively high priority bug because it is not only severe, but also highly likely to occur because it arises whenever Smithy is played under common game conditions.
+
+
+Bug Report #2
+Bug 2: Smithy card draws up to four cards instead of three
+Summary: There is a bug in my teammate’s Smithy card implementation, which causes the player to draw up to four cards rather than three.
+
+Observation: 
+This bug is somewhat more difficult to observe because of the combined effect of this bug (Bug 2) and the bug described as Bug 1 in the previous bug report. Because Bug 1 causes the player to discard an extra card from their hand after drawing their cards, an additional card drawn as a result of Bug 2 will still result in the expected number of cards being added to the player’s hand. 
+
+Detection option 1
+One simple method for observing this bug would be to fix the function to eliminate Bug 1, and then re-run testing suite to observe the number of cards drawn under normal conditions with at least 4 cards in the deck. With Bug 1 fixed, the Smithy card should increase the player’s hand count by 2 (three cards drawn, minus one discarded) if there are at least 3 cards available in the deck, but due to Bug 2 the player’s hand count will in fact increase by 3.
+
+Detection option 2
+If it is not possible to correct Bug 1 prior to searching for Bug 2, it can still be seen from simple unit testing that the Smithy implementation is drawing an extra card beyond what it should. If the input game state is configured so that there are four or more cards in the input deck, then playing Smithy should decrease the number of cards in the deck by 3. Due to the bug, it can be seen that the current implementation of Smithy reduces the number of cards in the deck by 4. For example, the input game state used to test for Bug 1 can also be used to reveal Bug 2:
+
+1)	Call the Dominion “initializeGame” function, which assigns each player 3 estates, 7 coppers, a starting hand comprised of 5 of these cards, and a starting deck comprised of five of these cards;
+2)	Call gainCard with the parameters necessary to add a Smithy card from the source pile to the current player’s hand;
+3)	Set a hand position variable to indicate the position of Smithy in the player’s hand.
+4)	Copy the starting game state to create a new game state that will be modified by playing Smithy;
+5)	Play Smithy with the current player, new game state, and hand position of Smithy as input parameters;
+6)	After playing Smithy, compare the game state’s “deckCount[thisPlayer]” value to the game state’s deckCount[thisPlayer] value prior to calling Smithy, to see the discrepancy between expected and actual results.
+
+//initialize general game variables
+    		int handpos = -1;
+    		int seed = 2;
+    		int numPlayers = 2;
+    		int thisPlayer = 0;
+		struct gameState G, testG;
+		int k[10] = {adventurer, embargo, village, minion, mine, cutpurse,
+			sea_hag, tribute, smithy, council_room};
+
+	// initialize a game state and player cards. Add smithy to hand.
+initializeGame(numPlayers, k, seed, &G);
+gainCard(smithy, &G, 2, thisPlayer);
+handpos = G.handCount[thisPlayer] -1;
+memcpy(&testG, &G, sizeof(struct gameState));
+    		int result = playSmithy(thisPlayer, &testG, handpos);
+
+printf("deck count = %d, expected = %d\n", testG.deckCount[thisPlayer], 1);
+    	MYASSERT(testG.deckCount[thisPlayer] == 1, "Deck count test");
+
+Cause: Examining my teammate’s Dominion code, it can be seen that incorrect for loop boundaries are responsible for Bug 2:
+
+//+3 Cards
+    for (i = 0; i <= 3; i++)
+    {
+        drawCard(currentPlayer, state);
+    }
+This bug can be fixed by either initializing the loop counter to 1 instead of 0, or by changing the loop continue test from “i <= 3” to “i < 3”.
+
+Version: This bug was detected on the most recent version of my teammate’s Dominion implementation in the project file dominion.c.
+
+Severity: This is a relatively high severity bug, because it could quickly lead gameplay to become distorted and seriously impact the integrity of a game.
+Priority: This is a relatively high priority bug because it is not only severe, but also highly likely to occur because it arises whenever Smithy is played under common game conditions.

@@ -1,14 +1,16 @@
-/****************************************
- * Filename: randomtestcard2.c
- * Author: Johannes Pikel
- * ONID: pikelj
- * Date: 2017.07.18
- * Class: CS362-400
- * Assignment #4 random testing refactored cards
- * Description: This random tester tests the mithy refactored function
- * Cite: the initialization of the gameState is taken from the 
- * example given in the betterTestDrawCard.c
- * **************************************/
+/*
+ * randomtestcard2.c
+ *
+ * Testing council_room card
+ 
+ */
+
+/*
+ * Include the following lines in your makefile:
+ *
+ * randomtestcard2: randomtestcard2.c dominion.o rngs.o
+ *      gcc -o randomtestcard2 -g  randomtestcard2.c dominion.o rngs.o $(CFLAGS)
+ */
 
 
 #include "dominion.h"
@@ -16,147 +18,418 @@
 #include <string.h>
 #include <stdio.h>
 #include <assert.h>
-#include <math.h>
 #include "rngs.h"
+#include <stdlib.h>
+#include <math.h>
+#include <stdbool.h>
 
-#define NOISY 0
+#define MYASSERT(statement, message) do \
+{ \
+if(!(statement)) \
+{ \
+fprintf(stdout, "Assert failed: %s\n", message);\
+} \
+else \
+{ \
+fprintf(stdout, "Assert passed: %s\n", message);\
+} \
+}while(0)
 
+#define TESTCARD "council_room"
 
-/****************************************
- *  Function: checkCard()
- *  Parameters:int, struct gameState, int
- *  Preconditions: passed a valid player int, a gameState that has been filled with
- *  values, and the current iteration of the random test
- *  Postconditions: print a failed message if the memcmp doesn't passs
- *  Description: 
- *  ***************************************/
+int main() {
 
-int checkCard(int p, struct gameState *post, int iteration){
-    struct gameState pre;
-    int handpos, count, deckCounter, adjust = 0, i;
+    //general game variables
 
-    handpos = floor(Random() * MAX_HAND);
-    memcpy(&pre, post, sizeof(struct gameState));
-    if (playSmithy(p, post, handpos) != 0){
-        printf("playSmithy failed \n");
+    int seed = 2;
+	struct gameState G, testG;
+	int k[10] = {adventurer, embargo, village, minion, mine, cutpurse,
+			sea_hag, tribute, smithy, council_room};
+
+	// initialize a game state and player cards. Add smithy to hand.
+    
+    // randomize game state and player cards.
+    
+    //set up random number generator
+    SelectStream(1);
+    PutSeed((long)seed);
+    
+
+    
+    //run test multiple times in a loop
+    for(int i = 0; i < 10000; i++){
+        
+    int supplyCount[treasure_map+1];
+    int inGameCount[treasure_map+1];
+        
+    //set number of players between 2-MAX (four for this game)
+    int numPlayers = floor(Random() * (MAX_PLAYERS - 2)) + 2; //at least two players
+	
+    
+    //set all supplyCount to -1 by default, to indicate card not in game
+    for(int i = 0; i <= treasure_map + 1; i++){
+        supplyCount[i] = -1;
+        inGameCount[i] = 0;}
+    
+    
+    //reset supply and inGame for all selected kingdom cards to a random amount, from 0 to 10
+    for(int i = 0; i < 10; i++){
+        int cardSupply = floor(Random() * (10 + 1));
+        supplyCount[k[i]] = cardSupply;
+        inGameCount[k[i]] = 10 - cardSupply;
     }
-
-    /* adjust for the drawCard, if our deckCount is larger than 0 then we can
-     * go ahead and proceed with drawing a card from it per usual
-     * otherwise we need to deal with the shuffle function so we copy the memory
-     * from the post deck into our copied deck and similarly for the discard 
-     * memory locations.  then we set the pre hand to be that of the changed games
-     * new card.  and complete the rest of the discardCard with setting the 
-     * handCount += 1, deckCount -=1 and discardCount = 0*/
-    for ( i = 0; i < 3; i++){
-        if(pre.deckCount[p] > 0){
-            count = pre.handCount[p];
-            deckCounter = pre.deckCount[p];
-            pre.hand[p][count] = pre.deck[p][deckCounter-1];
-            pre.handCount[p] += 1;
-            pre.deckCount[p] -= 1;
-        } else if (pre.discardCount[p] > 0){
-            memcpy(pre.deck[p], post->deck[p], sizeof(int) * pre.discardCount[p]);
-            memcpy(pre.discard[p], post->discard[p], sizeof(int)*pre.discardCount[p]);
-            pre.hand[p][post->handCount[p]-1] = post->hand[p][post->handCount[p]-1];
-            pre.handCount[p]++;
-            pre.deckCount[p] = pre.discardCount[p]-1;
-            pre.discardCount[p] = 0;
-            adjust = 1;
+    
+    //set all victory cards supply to random amount from 0 to 8 if players = 2, or from 0 to 12 if players > 2
+    int victorycards = 12;
+    if(numPlayers == 2)
+        victorycards = 8;
+    for(int i = duchy; i <= province; i++){
+        supplyCount[i] = floor(Random() * (victorycards + 1));
+        inGameCount[i] = victorycards - supplyCount[i];}
+    supplyCount[estate] = floor(Random() * (victorycards - (3*numPlayers) + 1)); // account for cards automatically in starting hard
+    inGameCount[estate] = victorycards - supplyCount[estate];
+    
+    //set curses supply to max 10 if 2 players, plus 2 for every additional 2 players
+    int numCurses = 10 + 10 * (numPlayers - 2)/2;
+    supplyCount[curse] = floor(Random() * (numCurses + 1));
+    inGameCount[curse] = numCurses - supplyCount[curse];
+    
+    //set treasures supply to random amount up to max, reserving 7*numPlayers copper for starting hands
+    int numCopper = 60 - 7 * numPlayers; // account for cards automatically in starting hard
+    int numSilver = 40;
+    int numGold = 30;
+    supplyCount[copper] = floor(Random() * (numCopper + 1));
+    inGameCount[copper] = numCopper - supplyCount[copper];
+    
+    supplyCount[silver] = floor(Random() * (numSilver + 1));
+    inGameCount[silver] = numSilver - supplyCount[silver];
+    
+    supplyCount[gold] = floor(Random() * (numGold + 1));
+    inGameCount[gold] = numGold - supplyCount[gold];
+    
+    int whoseTurn = floor(Random() * numPlayers); //randomize current player
+    int phase = 0; //let phase be 0, to allow cards to be played
+    int outpostPlayed = floor(Random() * 2); //randomize outpost played
+    int outpostTurn =  floor(Random() * 2); //randomize outpost played
+    int numActions = floor(Random() * 5); //randomize number of actions
+    int coins = floor(Random() * 10); //randomize number of coins
+    int numBuys = floor(Random() * 5); //randomize number of buys
+    
+    //set default embargo tokens, played count to 0
+    int embargoTokens[treasure_map+1];
+    for(int i = 0; i <= treasure_map; i++)
+        embargoTokens[i] = 0;
+    int embargoPlayed = 0;
+    
+    //if embargo in play, update embargo tokens and played count to random amount up to 10
+    if(supplyCount[embargo] != -1){
+        int embargoInPlay = 10 - supplyCount[embargo];
+        embargoPlayed = floor(Random() * (embargoInPlay + 1));
+        inGameCount[embargo] = inGameCount[embargo] - embargoPlayed;
+        
+        for(int i = 0; i < embargoPlayed; i++){
+        	int embargoCardIndex = floor(Random() * (10));
+            embargoTokens[k[embargoCardIndex]]++;
         }
     }
-    /* adjust for discardCard 
-     * so we know that our playedCards will contain the card in the handpos
-     * and we know that our playedCardCount will incremement by 1
-     * the remaining if else statements follow the discardCard function*/
-    pre.playedCards[pre.playedCardCount] = pre.hand[p][handpos];
-    pre.playedCardCount += 1;
-    pre.hand[p][handpos] = -1;
-    if (handpos == pre.handCount[p] - 1)
-        pre.handCount[p] -= 1;
-    else if(pre.handCount[p] == 1)
-        pre.handCount[p] -= 1;
-    else {
-        /* i was having trouble with the situation where the cards got shuffled here
-         * so I managed to get all tests but 2 pass without using the memcpy.  Not my 
-         * preferred method but at the moment this is the best I could do.
-         * I did get it to work without the memcpy by copying the three positions
-         * from the post hand into the pre hand to get them to match. I suspec this
-         * may have to happen with smithy because we sould only be triggering this
-         * effect if the deck was < 0 and the deck got shuffled.  So we are no 
-         * longer able at that point to make a deterministic assumption about which
-         * cards we draw from the deck, due to the shuffle*/
-        if(adjust){
-//            memcpy(pre.hand[p], post->hand[p], sizeof(int) * pre.handCount[p]);
-            pre.hand[p][handpos] = post->hand[p][handpos];
-            pre.hand[p][pre.handCount[p]-1] = post->hand[p][pre.handCount[p]-1];
-            pre.hand[p][post->handCount[p]-2] = post->hand[p][post->handCount[p]-2];
-        } else {
-            pre.hand[p][handpos] = pre.hand[p][(pre.handCount[p]-1)];
-            pre.hand[p][pre.handCount[p]-1] = -1;
-        }
-        pre.handCount[p] -= 1;
+    
+    //allocate each card in play to a random player to create each player's deck, discard, and hand pool.
+    bool allCardsAllocated = false;
+    int playerCards[MAX_PLAYERS][MAX_DECK];
+    int playerCardCount[MAX_PLAYERS];
+    
+    //assignment 7 copper and 3 estates to each player
+    for(int i = 0; i < numPlayers; i++){
+        playerCardCount[i] = 10;
+    	for(int j = 0; j < 7; j++)
+        	playerCards[i][j] = copper;
+        for(int k = 7; k < 10; k++)
+            playerCards[i][k] = estate;}
+    
+    //assignment of remaining in-play cards to each player
+    while(!allCardsAllocated){
+        bool movedCard = false;
+        for(int i = 0; i <= treasure_map; i++){
+            if(inGameCount[i] > 0){
+                int selectedPlayer = floor(Random() * numPlayers);
+                playerCards[selectedPlayer][playerCardCount[selectedPlayer]] = i;
+                playerCardCount[selectedPlayer]++;
+                inGameCount[i]--;
+                movedCard = true;}
+            }
+        if(movedCard == false)
+          allCardsAllocated = true;
     }
-    /* after setting our pre copied stats to what should be smithy correctl
-     * we'll check the memory to see if it is the same, we'll only print a message
-     * if an iteration fails, otherwise we're silent.
-     * I tested this initially by removing the bugs from smithy that I introduced and
-     * it worked just fine, of course after reintroducing the bug, all of our tests
-     * failed as we should expect.*/
-    if (memcmp(&pre, post, sizeof(struct gameState)) != 0){
-        if(NOISY){
-            printf ("PRE: p %d HC %d DeC %d DiC %d plCC:%d plC:%d hnd:%d lst:%d \n",
-                    p, pre.handCount[p], pre.deckCount[p], pre.discardCount[p],
-                    pre.playedCardCount, pre.playedCards[pre.playedCardCount],
-                    pre.hand[p][handpos], pre.hand[p][pre.handCount[p]-2]);
-            printf ("POST: p %d HC %d DeC %d DiC %d plCC:%d plC:%d hnd:%d lst:%d\n",
-                    p, post->handCount[p], post->deckCount[p], post->discardCount[p],
-                    post->playedCardCount, post->playedCards[post->playedCardCount],
-                    post->hand[p][handpos], post->hand[p][pre.handCount[p]-2]);
+    
+    //distribute cards in each player's allocation to their hand, deck, and discard pile
+    int hand[MAX_PLAYERS][MAX_HAND];
+    int handCount[MAX_PLAYERS];
+    int deck[MAX_PLAYERS][MAX_DECK];
+    int deckCount[MAX_PLAYERS];
+    int discard[MAX_PLAYERS][MAX_DECK];
+    int discardCount[MAX_PLAYERS];
+    for(int i = 0; i < numPlayers; i++){
+        handCount[i] = deckCount[i] = discardCount[i] = 0;
+        while(playerCardCount[i] > 0){
+            int destination = floor(Random() * 4); //bump range to 4 to increase chance of populating deck, rather than hand or discard
+            int card = floor(Random() * playerCardCount[i]);
+            switch(destination){
+                case 0:
+                    hand[i][handCount[i]] = playerCards[i][card];
+                    handCount[i]++;
+                    break;
+                case 1:
+                    deck[i][deckCount[i]] = playerCards[i][card];
+                    deckCount[i]++;
+                    break;
+                case 2:
+                    deck[i][deckCount[i]] = playerCards[i][card];
+                    deckCount[i]++;
+                    break;
+                case 3:
+                    discard[i][discardCount[i]] = playerCards[i][card];
+                    discardCount[i]++;
+                    break;
+            }
+            for (int j = card; j < playerCardCount[i]-1; j++) {
+                playerCards[i][j] = playerCards[i][j+1];}
+            playerCardCount[i]--;
         }
-        printf("Iteration:%d memcmp failed.\n", iteration);
     }
 
-    return 0;
+    //transfer data to game state
+    G.numPlayers = numPlayers;
+    for(int i = 0; i <= treasure_map; i++){
+        G.supplyCount[i] = supplyCount[i];
+        G.embargoTokens[i] = embargoTokens[i];}
+    G.outpostPlayed = outpostPlayed;
+    G.outpostTurn = outpostTurn;
+    G.whoseTurn = whoseTurn;
+    G.phase = phase;
+    G.numActions = numActions;
+    G.coins = coins;
+    G.numBuys = numBuys;
+    for(int i = 0; i < MAX_PLAYERS; i++){
+        G.handCount[i] = handCount[i];
+        G.discardCount[i] = discardCount[i];
+        G.deckCount[i] = deckCount[i];
+        for(int j = 0; j < MAX_DECK; j++)
+        {
+            G.hand[i][j] = hand[i][j];
+            G.deck[i][j] = deck[i][j];
+            G.discard[i][j] = discard[i][j];
+        }
+    }
+    
+    //set played cards to zero for now
+    for(int i = 0; i < MAX_DECK; i++)
+        G.playedCards[i] = 0;
+    G.playedCardCount = 0;
+    
 
+    //select starting player
+    int thisPlayer = G.whoseTurn;
+        
+    //for council_room, adjust random starting conditions to ensure that deckcount is below 4 with some frequency
+        if(floor(Random() * (100)) > 90){ //10% chance
+            while((G.deckCount[thisPlayer] + G.discardCount[thisPlayer]) > 4){
+                G.deckCount[thisPlayer] /= 2;
+                G.discardCount[thisPlayer] /= 2;
+            }}
+        else if(floor(Random() * (100)) > 90){ //10% chance
+                while((G.deckCount[thisPlayer] + G.discardCount[thisPlayer]) > 3){
+                    G.deckCount[thisPlayer] /= 2;
+                    G.discardCount[thisPlayer] /= 2;
+                }}
+        else if(floor(Random() * (100)) > 90){ //10% chance
+                while((G.deckCount[thisPlayer] + G.discardCount[thisPlayer]) > 2){
+                    G.deckCount[thisPlayer] /= 2;
+                    G.discardCount[thisPlayer] /= 2;
+                }}
+        else if(floor(Random() * (100)) > 90){ //10% chance
+                while((G.deckCount[thisPlayer] + G.discardCount[thisPlayer]) > 1){
+                    G.deckCount[thisPlayer] /= 2;
+                    G.discardCount[thisPlayer] /= 2;
+                }}
+            
+        
+    //start game with council_room in hand
+	G.supplyCount[council_room]++;
+    gainCard(council_room, &G, 2, thisPlayer);
+    int handpos = G.handCount[thisPlayer] -1;
+    
+    
+	printf("\n----------------- Testing Card: %s, Trial %d ----------------\n", TESTCARD, i);
+
+	// copy the game state to a test case
+	memcpy(&testG, &G, sizeof(struct gameState));
+    
+    int result = playCouncilRoom(thisPlayer, &testG, handpos);
+
+    if(G.deckCount[thisPlayer] + G.discardCount[thisPlayer] >= 4){
+        printf("Deck count plus discard count >= 4\n");
+        printf("hand count = %d, expected = %d\n", testG.handCount[thisPlayer], G.handCount[thisPlayer] + 3);
+        for(int i = 0; i < numPlayers; i++){
+            if(i != thisPlayer){
+                if(G.deckCount[i] + G.discardCount[i] > 0)
+                	printf("hand count for other player %d = %d, expected = %d\n", i, testG.handCount[i], G.handCount[i] + 1);
+                else
+                    printf("hand count for other player %d = %d, expected = %d\n", i, testG.handCount[i], G.handCount[i]);}}
+        printf("deck and discard count for current player = %d, expected = %d\n",  testG.deckCount[thisPlayer] + testG.discardCount[thisPlayer], G.deckCount[thisPlayer] + G.discardCount[thisPlayer] - 4);
+        for(int i = 0; i < numPlayers; i++){
+            if(i != thisPlayer){
+                if(G.deckCount[i] + G.discardCount[i] > 0)
+                    printf("deck and discard count for other player %d = %d, expected = %d\n", i, testG.deckCount[i] + testG.discardCount[i], G.discardCount[i] + G.deckCount[i] - 1);
+                else
+                    printf("deck and discard count for other player %d = %d, expected = %d\n", i, testG.deckCount[i] + testG.discardCount[i], G.discardCount[i] + G.deckCount[i]);}}
+        printf("ending played card count = %d, expected = %d\n", testG.playedCardCount, G.playedCardCount + 1);
+        printf("ending played card is council_room = %d, expected = %d\n", testG.playedCards[testG.playedCardCount -1], council_room);
+        printf("numBuys = %d, expected = %d\n", testG.numBuys, G.numBuys + 1);
+        
+        MYASSERT(testG.handCount[thisPlayer] == G.handCount[thisPlayer] + 3, "Hand count test");
+        for(int i = 0; i < numPlayers; i++){
+            if(i != thisPlayer){
+                if(G.deckCount[i] + G.discardCount[i] > 0)
+            		MYASSERT(testG.handCount[i] == G.handCount[i] + 1, "Other player handcount increased test");
+                else
+                    MYASSERT(testG.handCount[i] == G.handCount[i], "Other player handcount same test");}}
+        MYASSERT(testG.deckCount[thisPlayer] + testG.discardCount[thisPlayer] == G.deckCount[thisPlayer] + G.discardCount[thisPlayer] - 4, "Deck count test");
+        for(int i = 0; i < numPlayers; i++){
+            if(i != thisPlayer){
+                if(deckCount[i] + G.discardCount[i] > 0)
+                    MYASSERT(testG.deckCount[i] + testG.discardCount[i] == G.deckCount[i] + G.discardCount[i] - 1, "Other player deckcount decreased test");
+                else
+                    MYASSERT(testG.deckCount[i] + testG.discardCount[i] == G.deckCount[i] + G.discardCount[i], "Other player deckcount same test");}}
+        
+        MYASSERT(testG.playedCardCount == G.playedCardCount + 1, "Played card count test");
+        MYASSERT(testG.playedCards[testG.playedCardCount - 1] == council_room, "Played card last added test");
+        MYASSERT(testG.numBuys == G.numBuys + 1, "Num Buys increased test");
+        MYASSERT(result == 0, "Return val is 0");
+
+    }
+    else if(G.deckCount[thisPlayer] + G.discardCount[thisPlayer] == 3){
+        printf("Deck count plus discard count == 3\n");
+        printf("hand count = %d, expected = %d\n", testG.handCount[thisPlayer], G.handCount[thisPlayer] + 2);
+        for(int i = 0; i < numPlayers; i++){
+            if(i != thisPlayer){
+                if(G.deckCount[i] + G.discardCount[i] > 0)
+                    printf("hand count for other player %d = %d, expected = %d\n", i, testG.handCount[i], G.handCount[i] + 1);
+                else
+                    printf("hand count for other player %d = %d, expected = %d\n", i, testG.handCount[i], G.handCount[i]);}}
+        printf("deck and discard count for current player = %d, expected = %d\n",  testG.deckCount[thisPlayer] + testG.discardCount[thisPlayer], G.deckCount[thisPlayer] + G.discardCount[thisPlayer] - 3);
+        for(int i = 0; i < numPlayers; i++){
+            if(i != thisPlayer){
+                if(G.deckCount[i] + G.discardCount[i] > 0)
+                    printf("deck and discard count for other player %d = %d, expected = %d\n", i, testG.deckCount[i] + testG.discardCount[i], G.discardCount[i] + G.deckCount[i] - 1);
+                else
+                    printf("deck and discard count for other player %d = %d, expected = %d\n", i, testG.deckCount[i] + testG.discardCount[i], G.discardCount[i] + G.deckCount[i]);}}
+        printf("ending played card count = %d, expected = %d\n", testG.playedCardCount, G.playedCardCount + 1);
+        printf("ending played card is council_room = %d, expected = %d\n", testG.playedCards[testG.playedCardCount -1], council_room);
+        printf("numBuys = %d, expected = %d\n", testG.numBuys, G.numBuys + 1);
+        
+        MYASSERT(testG.handCount[thisPlayer] == G.handCount[thisPlayer] + 2, "Hand count test");
+        for(int i = 0; i < numPlayers; i++){
+            if(i != thisPlayer){
+                if(G.deckCount[i] + G.discardCount[i] > 0)
+                    MYASSERT(testG.handCount[i] == G.handCount[i] + 1, "Other player handcount increased test");
+                else
+                    MYASSERT(testG.handCount[i] == G.handCount[i], "Other player handcount same test");}}
+        MYASSERT(testG.deckCount[thisPlayer] + testG.discardCount[thisPlayer] == G.deckCount[thisPlayer] + G.discardCount[thisPlayer] - 3, "Deck count test");
+        for(int i = 0; i < numPlayers; i++){
+            if(i != thisPlayer){
+                if(deckCount[i] + G.discardCount[i] > 0)
+                    MYASSERT(testG.deckCount[i] + testG.discardCount[i] == G.deckCount[i] + G.discardCount[i] - 1, "Other player deckcount decreased test");
+                    else
+                        MYASSERT(testG.deckCount[i] + testG.discardCount[i] == G.deckCount[i] + G.discardCount[i], "Other player deckcount same test");}}
+        MYASSERT(testG.playedCardCount == G.playedCardCount + 1, "Played card count test");
+        MYASSERT(testG.playedCards[testG.playedCardCount - 1] == council_room, "Played card last added test");
+        MYASSERT(testG.numBuys == G.numBuys + 1, "Num Buys increased test");
+        MYASSERT(result == 0, "Return val is 0");
+	}
+    else if(G.deckCount[thisPlayer] + G.discardCount[thisPlayer] == 2){
+        printf("Deck count plus discard count == 2\n");
+        printf("hand count = %d, expected = %d\n", testG.handCount[thisPlayer], G.handCount[thisPlayer] + 1);
+        for(int i = 0; i < numPlayers; i++){
+            if(i != thisPlayer){
+                if(G.deckCount[i] + G.discardCount[i] > 0)
+                    printf("hand count for other player %d = %d, expected = %d\n", i, testG.handCount[i], G.handCount[i] + 1);
+                else
+                    printf("hand count for other player %d = %d, expected = %d\n", i, testG.handCount[i], G.handCount[i]);}}
+        printf("deck and discard count for current player = %d, expected = %d\n",  testG.deckCount[thisPlayer] + testG.discardCount[thisPlayer], G.deckCount[thisPlayer] + G.discardCount[thisPlayer] - 2);
+        for(int i = 0; i < numPlayers; i++){
+            if(i != thisPlayer){
+                if(G.deckCount[i] + G.discardCount[i] > 0)
+                    printf("deck and discard count for other player %d = %d, expected = %d\n", i, testG.deckCount[i] + testG.discardCount[i], G.discardCount[i] + G.deckCount[i] - 1);
+                else
+                    printf("deck and discard count for other player %d = %d, expected = %d\n", i, testG.deckCount[i] + testG.discardCount[i], G.discardCount[i] + G.deckCount[i]);}}
+        printf("ending played card count = %d, expected = %d\n", testG.playedCardCount, G.playedCardCount + 1);
+        printf("ending played card is council_room = %d, expected = %d\n", testG.playedCards[testG.playedCardCount -1], council_room);
+        printf("numBuys = %d, expected = %d\n", testG.numBuys, G.numBuys + 1);
+        
+        MYASSERT(testG.handCount[thisPlayer] == G.handCount[thisPlayer] + 1, "Hand count test");
+        for(int i = 0; i < numPlayers; i++){
+            if(i != thisPlayer){
+                if(G.deckCount[i] + G.discardCount[i] > 0)
+                    MYASSERT(testG.handCount[i] == G.handCount[i] + 1, "Other player handcount increased test");
+                else
+                    MYASSERT(testG.handCount[i] == G.handCount[i], "Other player handcount same test");}}
+        MYASSERT(testG.deckCount[thisPlayer] + testG.discardCount[thisPlayer] == G.deckCount[thisPlayer] + G.discardCount[thisPlayer] - 2, "Deck count test");
+        for(int i = 0; i < numPlayers; i++){
+            if(i != thisPlayer){
+                if(deckCount[i] + G.discardCount[i] > 0)
+                    MYASSERT(testG.deckCount[i] + testG.discardCount[i] == G.deckCount[i] + G.discardCount[i] - 1, "Other player deckcount decreased test");
+                else
+                    MYASSERT(testG.deckCount[i] + testG.discardCount[i] == G.deckCount[i] + G.discardCount[i], "Other player deckcount same test");}}
+        MYASSERT(testG.playedCardCount == G.playedCardCount + 1, "Played card count test");
+        MYASSERT(testG.playedCards[testG.playedCardCount - 1] == council_room, "Played card last added test");
+        MYASSERT(testG.numBuys == G.numBuys + 1, "Num Buys increased test");
+        MYASSERT(result == 0, "Return val is 0");
+        
+    }
+    else if(G.deckCount[thisPlayer] + G.discardCount[thisPlayer] == 1){
+        printf("Deck count plus discard count == 1\n");
+        printf("hand count = %d, expected = %d\n", testG.handCount[thisPlayer], G.handCount[thisPlayer] + 0);
+        for(int i = 0; i < numPlayers; i++){
+            if(i != thisPlayer){
+                if(G.deckCount[i] + G.discardCount[i] > 0)
+                    printf("hand count for other player %d = %d, expected = %d\n", i, testG.handCount[i], G.handCount[i] + 1);
+                else
+                    printf("hand count for other player %d = %d, expected = %d\n", i, testG.handCount[i], G.handCount[i]);}}
+        printf("deck and discard count for current player = %d, expected = %d\n",  testG.deckCount[thisPlayer] + testG.discardCount[thisPlayer], G.deckCount[thisPlayer] + G.discardCount[thisPlayer] - 1);
+        for(int i = 0; i < numPlayers; i++){
+            if(i != thisPlayer){
+                if(G.deckCount[i] + G.discardCount[i] > 0)
+                	printf("deck and discard count for other player %d = %d, expected = %d\n", i, testG.deckCount[i] + testG.discardCount[i], G.discardCount[i] + G.deckCount[i] - 1);
+                else
+                    printf("deck and discard count for other player %d = %d, expected = %d\n", i, testG.deckCount[i] + testG.discardCount[i], G.discardCount[i] + G.deckCount[i]);}}
+        printf("ending played card count = %d, expected = %d\n", testG.playedCardCount, G.playedCardCount + 1);
+        printf("ending played card is council_room = %d, expected = %d\n", testG.playedCards[testG.playedCardCount -1], council_room);
+        printf("numBuys = %d, expected = %d\n", testG.numBuys, G.numBuys + 1);
+        
+        MYASSERT(testG.handCount[thisPlayer] == G.handCount[thisPlayer] + 0, "Hand count test");
+        for(int i = 0; i < numPlayers; i++){
+            if(i != thisPlayer){
+                if(G.deckCount[i] + G.discardCount[i] > 0)
+                    MYASSERT(testG.handCount[i] == G.handCount[i] + 1, "Other player handcount increased test");
+                else
+                    MYASSERT(testG.handCount[i] == G.handCount[i], "Other player handcount same test");}}
+        MYASSERT(testG.deckCount[thisPlayer] + testG.discardCount[thisPlayer] == G.deckCount[thisPlayer] + G.discardCount[thisPlayer] - 1, "Deck count test");
+        for(int i = 0; i < numPlayers; i++){
+            if(i != thisPlayer){
+                if(deckCount[i] + G.discardCount[i] > 0)
+                	MYASSERT(testG.deckCount[i] + testG.discardCount[i] == G.deckCount[i] + G.discardCount[i] - 1, "Other player deckcount decreased test");
+                else
+                    MYASSERT(testG.deckCount[i] + testG.discardCount[i] == G.deckCount[i] + G.discardCount[i], "Other player deckcount same test");}}
+        MYASSERT(testG.playedCardCount == G.playedCardCount + 1, "Played card count test");
+        MYASSERT(testG.playedCards[testG.playedCardCount - 1] == council_room, "Played card last added test");
+        MYASSERT(testG.numBuys == G.numBuys + 1, "Num Buys increased test");
+        MYASSERT(result == 0, "Return val is 0");
+    }
+    
+	printf("\n >>>>> Testing complete %s <<<<<\n\n", TESTCARD);
+
+    }
+	return 0;
 }
 
-/****************************************
- *  Function: main() 
- *  Parameters:none
- *  Preconditions: none
- *  Postconditions: village card randomly tested
- *  Description: fill the gameState struct with a bunch of random values 
- *  then specifically we need to use a valid number of players, deckCount,
- *  discardCount, handCount, playedCardCount.  This is because we use each
- *  of these values in the village function and from the dependencies such as
- *  drawCard and discardCard that are called inside of village.
- *  then pass the gameState struct to the oracle checkCard
- *  ***************************************/
 
-int main(void){
-
-    struct gameState rndGame;
-    int n, i, player;
-
-    fprintf(stdout, "Testing playSmithy randomly\n");
-
-    SelectStream(2);
-    PutSeed(3);
-
-    for ( n = 0; n < 2000; n++){
-        for(i = 0; i < sizeof(struct gameState); i++){
-            ((char*)&rndGame)[i] = floor(Random() * 256);
-        }
-        player = floor(Random() * 2);
-        rndGame.deckCount[player] = floor(Random() * MAX_DECK);
-        rndGame.discardCount[player] = floor(Random() * MAX_DECK);
-        rndGame.handCount[player] = floor(Random() * MAX_HAND);
-        /*use minus 1 because we epxect to discard 1 card from the smithy card*/
-        rndGame.playedCardCount = floor(Random() * MAX_HAND) - 1;
-        checkCard(player, &rndGame, n);
-    }
-
-    fprintf(stdout, "Finished all tests.\n");
-    return 0;
-}

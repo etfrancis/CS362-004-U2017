@@ -1,98 +1,170 @@
-/****************************************
- * Filename: cardtest1.c
- * Author: Johannes Pikel
- * Date: 2017.07.06
- * Class: CS362-400
- * ONID: pikelj
- * Assignment: #3
- * Description: this is a unit test file for the playSmithy function in dominion.c
- * *************************************/
+/*
+ * cardtest1.c
+ *
+ * Testing smithy card
+ 
+ */
+
+/*
+ * Include the following lines in your makefile:
+ *
+ * cardtest1: cardtest1.c dominion.o rngs.o
+ *      gcc -o cardtest1 -g  cardtest1.c dominion.o rngs.o $(CFLAGS)
+ */
+
 
 #include "dominion.h"
-#include <stdio.h>
-#include <stdlib.h>
+#include "dominion_helpers.h"
 #include <string.h>
+#include <stdio.h>
 #include <assert.h>
-#include "testhelper.h"
+#include "rngs.h"
+#include <stdlib.h>
+
+#define MYASSERT(statement, message) do \
+{ \
+if(!(statement)) \
+{ \
+fprintf(stdout, "Assert failed: %s\n", message);\
+} \
+else \
+{ \
+fprintf(stdout, "Assert passed: %s\n", message);\
+} \
+}while(0)
+
+#define TESTCARD "smithy"
+
+int main() {
+
+    //general game variables
+
+    int handpos = -1;
+    int seed = 2;
+    int numPlayers = 2;
+    int thisPlayer = 0;
+	struct gameState G, testG;
+	int k[10] = {adventurer, embargo, village, minion, mine, cutpurse,
+			sea_hag, tribute, smithy, council_room};
+
+	// initialize a game state and player cards. Add smithy to hand.
+    
+	initializeGame(numPlayers, k, seed, &G);
+    gainCard(smithy, &G, 2, thisPlayer);
+    handpos = G.handCount[thisPlayer] -1;
+    
+    
+	printf("\n----------------- Testing Card: %s ----------------\n", TESTCARD);
+
+	// ----------- TEST 1:  --------------
+	printf("\nTEST 1: Using deck with at least 3 cards in it\n");
+    
+
+	// copy the game state to a test case
+	memcpy(&testG, &G, sizeof(struct gameState));
+    
+    int result = playSmithy(thisPlayer, &testG, handpos);
+
+	printf("hand count = %d, expected = %d\n", testG.handCount[thisPlayer], G.handCount[thisPlayer] + 2);
+	printf("deck count = %d, expected = %d\n", testG.deckCount[thisPlayer], G.deckCount[thisPlayer] - 3);
+    printf("ending played card count = %d, expected = %d\n", testG.playedCardCount, G.playedCardCount + 1);
+    
+    MYASSERT(testG.handCount[thisPlayer] == G.handCount[thisPlayer] + 2, "Hand count test");
+    MYASSERT(testG.deckCount[thisPlayer] == G.deckCount[thisPlayer] - 3, "Deck count test");
+	MYASSERT(testG.playedCardCount == G.playedCardCount + 1, "Played card count test");
+    MYASSERT(testG.playedCards[testG.playedCardCount -1] == smithy, "Played card last added test");
+    MYASSERT(result == 0, "Return val is 0");
+    
+    // ----------- TEST 2:  --------------
+    printf("\nTEST 2: Using deck with no cards in it\n");
+    
+    
+    // copy the game state to a test case
+    memcpy(&testG, &G, sizeof(struct gameState));
+    testG.deckCount[thisPlayer] = 0; //set deck size to 0
+    
+    result = playSmithy(thisPlayer, &testG, handpos);
+    
+    printf("hand count = %d, expected = %d\n", testG.handCount[thisPlayer], G.handCount[thisPlayer]);
+    printf("deck count = %d, expected = %d\n", testG.deckCount[thisPlayer], G.deckCount[thisPlayer]);
+    printf("ending played card count = %d, expected = %d\n", testG.playedCardCount, G.playedCardCount + 1);
+    
+    MYASSERT(testG.handCount[thisPlayer] == G.handCount[thisPlayer] -1, "Hand count test");
+    MYASSERT(testG.deckCount[thisPlayer] == 0, "Deck count test");
+    MYASSERT(testG.playedCardCount == G.playedCardCount + 1, "Played card count test");
+    MYASSERT(testG.playedCards[testG.playedCardCount -1] == smithy, "Played card last added test");
+    MYASSERT(result == 0, "Return val is 0");
+           
+
+           
+    // ----------- TEST 3:  --------------
+    printf("\nTEST 3: Using deck with two cards in it\n");
+           
+           
+    // copy the game state to a test case
+    memcpy(&testG, &G, sizeof(struct gameState));
+    testG.deckCount[thisPlayer] = 2; //set deck size to 2
+           
+    result = playSmithy(thisPlayer, &testG, handpos);
+           
+    printf("hand count = %d, expected = %d\n", testG.handCount[thisPlayer], G.handCount[thisPlayer] +1);
+    printf("deck count = %d, expected = %d\n", testG.deckCount[thisPlayer], 0);
+    printf("ending played card count = %d, expected = %d\n", testG.playedCardCount, G.playedCardCount + 1);
+                  
+    MYASSERT(testG.handCount[thisPlayer] == G.handCount[thisPlayer] + 1, "Hand count test");
+    MYASSERT(testG.deckCount[thisPlayer] == 0, "Deck count test");
+    MYASSERT(testG.playedCardCount == G.playedCardCount + 1, "Played card count test");
+    MYASSERT(testG.playedCards[testG.playedCardCount -1] == smithy, "Played card last added test");
+    MYASSERT(result == 0, "Return val is 0");
+           
+           
+    // ----------- TEST 4:  --------------
+    printf("\nTEST 4: Using deck with three cards in it\n");
+           
+           
+    // copy the game state to a test case
+    memcpy(&testG, &G, sizeof(struct gameState));
+    testG.deckCount[thisPlayer] = 3; //set deck size to 3
+           
+    result = playSmithy(thisPlayer, &testG, handpos);
+           
+    printf("hand count = %d, expected = %d\n", testG.handCount[thisPlayer], G.handCount[thisPlayer] + 2);
+    printf("deck count = %d, expected = %d\n", testG.deckCount[thisPlayer], 0);
+    printf("ending played card count = %d, expected = %d\n", testG.playedCardCount, G.playedCardCount + 1);
+                  
+    MYASSERT(testG.handCount[thisPlayer] == G.handCount[thisPlayer] + 2, "Hand count test");
+    MYASSERT(testG.deckCount[thisPlayer] == 0, "Deck count test");
+    MYASSERT(testG.playedCardCount == G.playedCardCount + 1, "Played card count test");
+    MYASSERT(testG.playedCards[testG.playedCardCount -1] == smithy, "Played card last added test");
+    MYASSERT(result == 0, "Return val is 0");
+           
+
+           
+    // ----------- TEST 5:  --------------
+    printf("\nTEST 5: Using deck with four cards in it\n");
+           
+           
+    // copy the game state to a test case
+    memcpy(&testG, &G, sizeof(struct gameState));
+    testG.deckCount[thisPlayer] = 4; //set deck size to 4
+           
+    result = playSmithy(thisPlayer, &testG, handpos);
+           
+    printf("hand count = %d, expected = %d\n", testG.handCount[thisPlayer], G.handCount[thisPlayer] + 2);
+    printf("deck count = %d, expected = %d\n", testG.deckCount[thisPlayer], 1);
+    printf("ending played card count = %d, expected = %d\n", testG.playedCardCount, G.playedCardCount + 1);
+                  
+    MYASSERT(testG.handCount[thisPlayer] == G.handCount[thisPlayer] + 2, "Hand count test");
+    MYASSERT(testG.deckCount[thisPlayer] == 1, "Deck count test");
+    MYASSERT(testG.playedCardCount == G.playedCardCount + 1, "Played card count test");
+    MYASSERT(testG.playedCards[testG.playedCardCount -1] == smithy, "Played card last added test");
+    MYASSERT(result == 0, "Return val is 0");
+    
+    
+	printf("\n >>>>> Testing complete %s <<<<<\n\n", TESTCARD);
 
 
-/****************************************
- * Function: main()
- * Parameters: none
- * Preconditions: none
- * Postconditions: unit test the playSmithy function
- * Description: smithy should add +3 cards to the players hand and should discard only
- * the smithy card.  So we'll arbitrarily add the smithy card to the first player's 
- * hand, play the card and then check against some expected variables.
- *
- * *************************************/
-int main(void){
-    struct gameState *testGame, *preGame;
-    int randSeed = 1;
-    int result;
-    int p, c;
-    int isCorrect = 1;
-
-    int k[10] = {adventurer, council_room, ambassador, gardens, mine,
-        remodel, smithy, village, baron, minion};
-
-
-    for ( p = 2; p < 5; p++){
-        printStars();
-        testGame = newGame();
-        preGame = newGame();
-        result = initializeGame(p, k, randSeed, testGame);
-        validate(result, 0);
-        result = initializeGame(p, k, randSeed, preGame);
-        memcpy(preGame, testGame, sizeof(struct gameState));
-        validate(result, 0);
-        printf("Unit test for the playSmithy function, with %d players\n", p);
-        
-        printCardsInHand(testGame, 0);
-        printCardsInDeck(testGame, 0);
-        printf("First we'll give ourselves the smithy card\n");
-        addACard(testGame, smithy, 0);
-        printCardsInHand(testGame, 0);
-        printf("Playing smithy, return = 0...");
-        validate(playSmithy(0, testGame, 5), RETSUCCESS);
-        /*validate that no funny business happened here with the first 5 cards we 
-         * had in our hand.*/
-        validateBaseHandIsSame(testGame, preGame, 0);
-        printCardsInHand(testGame, 0);
-        /*we need to check that the handCount is +3 since the smithy card gets discarded
-         * */
-        validateHandCountChange(testGame, preGame, 0, 3);
-        /* since the smithy card gets discarded to the played pile we'll also check that
-         * here*/
-        printf("Should only be 1 card in playedCard pile 'smithy'\n");
-        printf("Played pile has %d...", testGame->playedCardCount);
-        validate(1, testGame->playedCardCount);
-        printCardsInPlayed(testGame);
-       /*since our deck count was 5 starting the game and we draw 3 cards it should
-         * be 2 now*/
-        validateDeckCountChange(testGame, preGame, 0, 3);
-
-        validateOtherPlayersNotChanged(testGame, preGame);
-        printf("Played cards should be different between the two games...");
-        isCorrect = -1;
-        for(c = 0; c < MAX_DECK; c++){
-            if(preGame->playedCards[c] != testGame->playedCards[c]){
-                isCorrect = 1;
-            }
-            preGame->playedCards[c] = 0;
-            testGame->playedCards[c] = 0;
-        }
-        validate(isCorrect, 1);
-        validateStaticVariables(testGame, preGame,0,0,0,0,0,0,0);
-        validateTreasureMap(testGame, preGame);
-        validateEmbargoTokens(testGame, preGame);
-
-        free(testGame);
-        free(preGame);
-    }
-    return 0;
+	return 0;
 }
-
-
 
 
