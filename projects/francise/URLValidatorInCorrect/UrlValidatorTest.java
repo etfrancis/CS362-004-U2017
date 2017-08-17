@@ -85,7 +85,7 @@ public class UrlValidatorTest extends TestCase {
 	   String authorityInValid = " .google.com";
 	   String portInValid = ":-1";
 	   String pathInValid = "/path& /";
-	   String queryInValid = "?&";
+	   String queryInValid = "? &";
 	   
 	   UrlValidator urlVal = new UrlValidator(null, null, UrlValidator.ALLOW_ALL_SCHEMES);
 	   boolean result = urlVal.isValid(schemeValid + authorityValid + portValid + pathValid + queryValid);
